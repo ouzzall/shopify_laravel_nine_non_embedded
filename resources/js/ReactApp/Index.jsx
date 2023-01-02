@@ -5,9 +5,9 @@ import MysteryDiscountApp from "./components/MysteryDiscountApp";
 
 export default function ReactApp() {
     return (
-            <BrowserRouter>
-                <MysteryDiscountApp />
-            </BrowserRouter>
+        <BrowserRouter>
+            <MysteryDiscountApp />
+        </BrowserRouter>
     );
 }
 
