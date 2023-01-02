@@ -2,95 +2,62 @@ import {Page, Card, Button, Icon, TextField, Select, DatePicker} from '@shopify/
 import {useState,useCallback} from 'react';
 import React from 'react';
 import { MobilePlusMajor } from '@shopify/polaris-icons';
-function Dashboard() {
-    const [storeName, setStoreName] = useState('Jaded Pixel');
 
-  const handleStoreName = useCallback((newValue) => setStoreName(newValue), []);
-  const [ruleName, setRuleName] = useState('');
+function NewCampaign() {
 
-  const handleRuleName = useCallback((newValue) => setRuleName(newValue), []);
+    const [campaignName, setCampaignName] = useState('');
 
-  const [selected, setSelected] = useState('today');
+    const [selectedApplyOnOptions, setSelectedApplyOnOptions] = useState('product');
+    const applyOnOptions = [
+        {label: 'Product', value: 'product'},
+        {label: 'Collection', value: 'collection'},
+        {label: 'All Store', value: 'all_store'},
+    ];
 
-  const handleSelectChange = useCallback((value) => setSelected(value), []);
-  const options = [
-    {label: 'Today', value: 'today'},
-    {label: 'Yesterday', value: 'yesterday'},
-    {label: 'Last 7 days', value: 'lastWeek'},
-  ];
+    const [selectedFurtherOption, setSelectedFurtherOption] = useState("today");
+    const furtherOptions = [
+        {label: 'Today', value: 'today'},
+        {label: 'Yesterday', value: 'yesterday'},
+        {label: 'Last 7 days', value: 'lastWeek'},
+    ];
 
-  const [selectedApplyOnOptions, setSelectedApplyOnOptions] = useState('product');
+    const [datePickerCheck, setDatePickerCheck] = useState(false);
 
-  const handleApplyOnOptions = useCallback((value) => setSelectedApplyOnOptions(value), []);
-  const applyOnOptions = [
-    {label: 'Product', value: 'product'},
-    {label: 'Collection', value: 'collection'},
-    {label: 'All Store', value: 'allStore'},
-  ];
-  const [selectedPreset, setSelectedPreset] = useState('selectpreset');
+    const [{month, year}, setDate] = useState({month: new Date().getMonth(), year: new Date().getFullYear()});
+    const [selectedDates, setSelectedDates] = useState({ start: new Date(), end: new Date() });
+    const handleMonthChange = useCallback((month, year) => setDate({month, year}), [],);
 
-  const handlePresetSelectChange = useCallback((value) => setSelectedPreset(value), []);
+    var date = new Date(selectedDates['start']),
+    mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+    day = ("0" + date.getDate()).slice(-2);
+    const myStartDate = [date.getFullYear(), mnth, day].join("-");
+    var enddate = new Date(selectedDates['end']),
+    endMnth = ("0" + (enddate.getMonth() + 1)).slice(-2),
+    endDay = ("0" + enddate.getDate()).slice(-2);
+    const myEndDate = [enddate.getFullYear(), endMnth, endDay].join("-");
+    // console.log(myStartDate);
+    // console.log(myEndDate);
+    const dateRange= `${myStartDate}  to  ${myEndDate}`;
 
-  const presetOptions = [
-    {label: 'Select  Preset', value: 'selectpreset'},
-    {label: 'Yesterday', value: 'yesterday'},
-    {label: 'Last 7 days', value: 'lastWeek'},
-  ];
-  const [selectedDiscount, setSelectedDiscount] = useState('fixed');
+    const [selectedPreset, setSelectedPreset] = useState('selectpreset');
+    const presetOptions = [
+        {label: 'Select  Preset', value: 'selectpreset'},
+        {label: 'Yesterday', value: 'yesterday'},
+        {label: 'Last 7 days', value: 'lastWeek'},
+    ];
 
-  const handleDiscountChange = useCallback((value) => setSelectedDiscount(value), []);
+    const [ruleName, setRuleName] = useState('');
 
-  const discountOptions = [
-    {label: 'Fixed Discount', value: 'fixed'},
-    {label: 'Percentage', value: 'percentage'},
-  ];
-  const [uptoFieldValue, setUptoFieldValue] = useState( );
+    const [selectedDiscount, setSelectedDiscount] = useState('fixed');
+    const discountOptions = [
+        {label: 'Fixed Discount', value: 'fixed'},
+        {label: 'Percentage', value: 'percentage'},
+    ];
 
-  const handleUptoFieldChange = useCallback(
-    (value) => setUptoFieldValue(value),
-    [],
-  );
-// date range code stat
-const [datePickerCheck, setDatePickerCheck] = useState(false);
-  function handleDuration() {
-    setDatePickerCheck(datePickerCheck => !datePickerCheck);
-  }
-    const [{month, year}, setDate] = useState({month: 1, year: 2018});
-    const [selectedDates, setSelectedDates] = useState({
-      start: new Date('Wed Feb 07 2018 '),
-      end: new Date('Mon Mar 12 2018 '),
-    });
+    const [uptoFieldValue, setUptoFieldValue] = useState("");
 
-    const handleMonthChange = useCallback(
-      (month, year) => setDate({month, year}),
-      [],
-    );
-    console.log(selectedDates);
-    console.log(selectedDates['start']);
-    console.log(selectedDates['end']);
-
-        var date = new Date(selectedDates['start']),
-          mnth = ("0" + (date.getMonth() + 1)).slice(-2),
-          day = ("0" + date.getDate()).slice(-2);
-        const myStartDate = [date.getFullYear(), mnth, day].join("-");
-        var enddate = new Date(selectedDates['end']),
-          endMnth = ("0" + (enddate.getMonth() + 1)).slice(-2),
-          endDay = ("0" + enddate.getDate()).slice(-2);
-        const myEndDate = [enddate.getFullYear(), endMnth, endDay].join("-");
-        console.log(myStartDate);
-        console.log(myEndDate);
-
-const dateRange= `${myStartDate}  to  ${myEndDate}`;
-
-
-// date range code end
     return (
       <Page>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-            <h1 className="Polaris-Header-Title" style={{paddingBottom:"20px",paddingTop:"10px"}}>Campaign Builder</h1>
-            <Button primary >Create Campaign</Button>
-        </div>
-
         <Card title="Create Campaign" >
             {/* <Card.Section>
             </Card.Section> */}
@@ -100,8 +67,8 @@ const dateRange= `${myStartDate}  to  ${myEndDate}`;
                     <p>Campaign Name</p>
                     <div style={{width:"300px"}}>
                         <TextField
-                        value={storeName}
-                        onChange={handleStoreName}
+                        value={campaignName}
+                        onChange={(e) => setCampaignName(e)}
                         autoComplete="off"
                         />
                     </div>
@@ -112,9 +79,9 @@ const dateRange= `${myStartDate}  to  ${myEndDate}`;
                     <p>Apply Mystery discount by</p>
                     <div style={{width:"300px"}}>
                         <Select
-                        options={applyOnOptions}
-                        onChange={handleApplyOnOptions}
-                        value={selectedApplyOnOptions}
+                            options={applyOnOptions}
+                            onChange={(e) => setSelectedApplyOnOptions(e)}
+                            value={selectedApplyOnOptions}
                         />
                     </div>
                 </div>
@@ -122,9 +89,9 @@ const dateRange= `${myStartDate}  to  ${myEndDate}`;
                     <p></p>
                     <div style={{width:"300px"}}>
                         <Select
-                        options={options}
-                        onChange={handleSelectChange}
-                        value={selected}
+                        options={furtherOptions}
+                        onChange={(e) => setSelectedFurtherOption(e)}
+                        value={selectedFurtherOption}
                         />
                     </div>
                 </div>
@@ -132,30 +99,24 @@ const dateRange= `${myStartDate}  to  ${myEndDate}`;
             </div>
             <Card.Section>
                 <div style={{paddingLeft:"40px",maxWidth: "610px"}}>
-
-                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderTop: "1px solid #e1e3e5",paddingTop:"20px"}}>
-                    <p>Select Duration</p>
-                    <div style={{width:"300px"}} >
-
-                         {/* <TextField
-                        onFocus={handleDuration}
-                        value={dateRange}
-                        /> */}
-                        <button  onClick={handleDuration} style={{background:"transparent",border:"1px solid #babfc4",borderRadius:"4px",padding:"9px 70px"}}>{dateRange}</button>
-                        { datePickerCheck &&
-                        <div className='datePickerDiv'>
-                        <DatePicker
-                        month={month}
-                        year={year}
-                        onChange={setSelectedDates}
-                        onMonthChange={handleMonthChange}
-                        selected={selectedDates}
-                        allowRange
-                      />
-                      </div>
-                        }
+                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderTop: "1px solid #e1e3e5",paddingTop:"20px"}}>
+                        <p>Select Duration</p>
+                        <div style={{width:"300px"}}>
+                            <button  onClick={() => setDatePickerCheck(!datePickerCheck)} style={{background:"transparent",border:"1px solid #babfc4",borderRadius:"4px",padding:"9px 70px"}}>{dateRange}</button>
+                            { datePickerCheck &&
+                            <div className='datePickerDiv'>
+                                <DatePicker
+                                    month={month}
+                                    year={year}
+                                    onChange={setSelectedDates}
+                                    onMonthChange={handleMonthChange}
+                                    selected={selectedDates}
+                                    allowRange
+                                />
+                            </div>
+                            }
+                        </div>
                     </div>
-                </div>
                 </div>
 
             </Card.Section>
@@ -168,7 +129,7 @@ const dateRange= `${myStartDate}  to  ${myEndDate}`;
                         <div style={{width:"190px"}}>
                        <Select
                         options={presetOptions}
-                        onChange={handlePresetSelectChange}
+                        onChange={(e) => setSelectedPreset(e)}
                         value={selectedPreset}
                         />
                         </div>
@@ -186,7 +147,7 @@ const dateRange= `${myStartDate}  to  ${myEndDate}`;
                         <div style={{width:"300px"}}>
                             <TextField
                             value={ruleName}
-                            onChange={handleRuleName}
+                            onChange={(e) => setRuleName(e)}
                             autoComplete="off"
                             />
                         </div>
@@ -196,7 +157,7 @@ const dateRange= `${myStartDate}  to  ${myEndDate}`;
                         <div style={{width:"300px"}}>
                           <Select
                             options={discountOptions}
-                            onChange={handleDiscountChange}
+                            onChange={(e) => setSelectedDiscount(e)}
                             value={selectedDiscount}
                             />
                         </div>
@@ -208,7 +169,7 @@ const dateRange= `${myStartDate}  to  ${myEndDate}`;
                             type="number"
                             prefix="$"
                             value={uptoFieldValue}
-                            onChange={handleUptoFieldChange}
+                            onChange={(e) => setUptoFieldValue(e)}
                             helpText="Enter the amount in multiple of 5"
                             autoComplete="off"
                             />
@@ -234,6 +195,6 @@ const dateRange= `${myStartDate}  to  ${myEndDate}`;
             </div>
         </Card>
       </Page>
-  );
+    );
 }
-export default Dashboard;
+export default NewCampaign;

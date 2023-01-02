@@ -18,7 +18,7 @@ library.add(
     faEye
 );
 
-function MyStore() {
+function Campaign() {
 
     const [loading, setLoading] = useState(false);
     const [active2, setActive2] = useState(false);
@@ -207,4 +207,4 @@ function MyStore() {
     </Page>
   );
 }
-export default MyStore;
+export default Campaign;

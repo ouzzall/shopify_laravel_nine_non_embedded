@@ -6,9 +6,9 @@ import CustomBar from "./CustomBar";
 // import NavigationCustom from "./NavigationCustom";
 
 import Loading from "./Loading";
-import Campains from "./Campains";
+import Campaign from "./Campaign";
 import Dashboard from "./Dashboard";
-import CampainBuilder from "./CampainBuilder";
+import NewCampaign from "./NewCampaign";
 import React from "react";
 import Rules from "./Rules";
 
@@ -24,8 +24,8 @@ const MysteryDiscountApp = () => {
                 <div className="position_check" style={{ width: "100%",marginTop:"55px" }}>
                     <Routes>
                         <Route path="/" element={<Dashboard /> } />
-                        <Route path="/campaigns" element={<Campains /> } />
-                        <Route path="/new-campaign" element={<CampainBuilder /> } />
+                        <Route path="/campaigns" element={<Campaign /> } />
+                        <Route path="/new-campaign" element={<NewCampaign /> } />
                         <Route path="/rules" element={<Rules /> } />
                         <Route path="*" element={<Loading login={false} /> } />
                     </Routes>
