@@ -69,7 +69,7 @@ function CustomBar() {
     );
 
     const searchResultsMarkup = (
-        <ActionList items={[{ content: "Rules" }, { content: "Emails" }]} />
+        <ActionList items={[{ content: "Campaign's" }, { content: "Rule's" }]} />
     );
 
     const searchFieldMarkup = (
