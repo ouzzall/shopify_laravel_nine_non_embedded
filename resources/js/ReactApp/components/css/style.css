@@ -1,0 +1,101 @@
+.storeGrid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.storesHeadder {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#checkboxButton button.Polaris-Button {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.ordersHeadder{
+    display: flex;
+    justify-content: space-between;
+    /* margin-top: 20px; */
+    padding-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+.ruleDiv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.ruleDiv span.Polaris-Badge {
+    margin-right: 5px;
+}
+.butoon-checkbox {
+    display: flex;
+    align-items: center;
+}
+
+.cross_handler {
+    display: none;
+}
+
+@media (max-width: 784.98px) {
+    /* .Polaris-Frame__Content {
+        padding-right: 20px;
+        padding-left: 20px;
+    } */
+
+    .cross_handler {
+        display: block;
+    }
+
+    .side_bar_handle {
+        display: none;
+    }
+
+    .position_check {
+        position: absolute;
+    }
+}
+.addNew{
+    width: 120px;
+    display: flex;
+    background: #E2F1EA;
+    border: none;
+    padding: 6px 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 400;
+}
+.addNew:hover{
+    cursor: pointer;
+}
+th.Polaris-DataTable__Cell.Polaris-DataTable__Cell--verticalAlignTop.Polaris-DataTable__Cell--header {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.customEditBtn{
+    border: none;
+    background: #EBEBEB;
+    box-shadow: 0px 1px 0px rgb(0 0 0 / 8%), inset 0px -1px 0px rgb(0 0 0 / 20%);
+    border-radius: 4px;
+    padding: 5px 16px 0px 12px;
+}
+.eitBtnIcon{
+    width: 12px;
+    margin-top: 4px;
+    margin-right: 5px;
+}
+
+.camplainTable td.Polaris-DataTable__Cell.Polaris-DataTable__Cell--verticalAlignTop {
+    padding-top: 28px;
+}
+.datePickerDiv {
+    background: #fff;
+    border-radius: 5px;
+    position: absolute;
+    padding: 10px;
+    z-index: 999;
+    margin-right: 20px;
+    box-shadow: 0px 10px 5px 4px rgba(0,0,0,0.39);
+}

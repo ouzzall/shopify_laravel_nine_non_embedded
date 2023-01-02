@@ -28,5 +28,6 @@ function vite_assets(): HtmlString
 
     return new HtmlString(<<<HTML
         <script type="module" src="/build/{$manifest['resources/js/app.js']['file']}"></script>
+        <link rel="stylesheet" href="/build/{$manifest['resources/js/app.js']['css'][0]}">
     HTML);
 }
