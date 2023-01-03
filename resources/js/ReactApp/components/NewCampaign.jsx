@@ -51,11 +51,7 @@ function NewCampaign() {
     ];
 
     const [selectedFurtherOption, setSelectedFurtherOption] = useState("");
-    const [furtherOptions, setFurtherOptions] = useState([
-        {label: 'Today', value: 'today'},
-        {label: 'Yesterday', value: 'yesterday'},
-        {label: 'Last 7 days', value: 'lastWeek'},
-    ]);
+    const [furtherOptions, setFurtherOptions] = useState([]);
 
     const [datePickerCheck, setDatePickerCheck] = useState(false);
 

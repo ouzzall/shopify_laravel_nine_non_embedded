@@ -166,12 +166,12 @@ function Campaign() {
                                 'text',
                             ]}
                             headings={[
-                                'Compaign Name',
+                                'Campaign Name',
                                 'Applied On',
                                 'Duration',
                                 'Link',
-                                'Action',
                                 'Switch',
+                                'Action',
                             ]}
                             rows={tableRows && tableRows}
                         />
