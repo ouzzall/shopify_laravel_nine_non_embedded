@@ -9,7 +9,7 @@ export default ({ command }) => ({
         rollupOptions: {
             input: ['resources/css/app.css', 'resources/js/app.js'],
         },
-        chunkSizeWarningLimit: 1600,
+        chunkSizeWarningLimit: 5000,
     },
     plugins: [
         reactRefresh(),
