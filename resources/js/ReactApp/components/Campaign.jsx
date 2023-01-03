@@ -7,53 +7,99 @@ import "./css/style.css";
 import "./css/toggle.css";
 import vedio from '../components/imges/image_one.png';
 import  Toggle  from './Toggle';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
     faEye,
-    faTrash
+    faTrash,
+    faPencil
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
     faTrash,
-    faEye
+    faEye,
+    faPencil
 );
 
 function Campaign() {
 
-    const [loading, setLoading] = useState(false);
-    const [active2, setActive2] = useState(false);
-    const toggleActive = useCallback(() => setActive2((active2) => !active2), []);
 
-    const [active, setActive] = useState(false);
-    const handleChange = useCallback(() => setActive(!active), [active]);
 
+    useEffect(() => {
+
+        fetch(`/get_all_campaigns`)
+        .then((response) => response.json())
+        .then((result) => {
+            console.log(result);
+            if(result.success == true)
+            {
+                const my_rows = [];
+
+                result.data.forEach(element => {
+                    my_rows.push([
+
+                    <div>
+                        <Text variant="headingMd" as="h6">
+                            {element.name}
+                        </Text>
+                        <p>{element.discount_on}</p>
+                    </div>,
+
+                    <p>{element.discount_on}</p>,
+
+                    `${element.start_date} - ${element.end_date}`,
+
+                    <Button plain>
+                        <div style={{display:"flex"}}>
+                            <Icon source={DuplicateMinor} color="base" /> Copy Link
+                        </div>
+                    </Button>,
+
+                    <Toggle toggled={true} onClick={logState} />,
+
+                    <div style={{display:"flex"}}>
+                        <FontAwesomeIcon style={{fontSize:"18px",cursor:"pointer"}} icon="fa-solid fa-pencil" />
+                        <div style={{marginLeft:"10px"}}>
+                            <FontAwesomeIcon style={{fontSize:"18px",cursor:"pointer"}} icon="fa-solid fa-trash" />
+                        </div>
+                    </div>
+                    ]);
+                });
+
+                setTableRowsStatic(my_rows);
+                setTableRows(my_rows);
+                setTotalQrCount(result.count);
+            }
+
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+
+    },[])
+
+    const [searchFieldValue, setSearchFieldValue] = useState("");
 
     const [tableRowsStatic,setTableRowsStatic] = useState([]);
+
     const [tableRows,setTableRows] = useState([]);
 
-
-    const [reload,setReload] = useState(false);
-
-    const navigate = useNavigate();
-
+    const [totalQrCount,setTotalQrCount] = useState(0);
 
     const [selectedFilterBy, setSelectedFilterBy] = useState('today');
 
     const handleSelectChange = useCallback((value) => setSelectedFilterBy(value), []);
 
     const filterByOptions = [
-      {label: 'Filter By', value: ''},
-      {label: 'Yesterday', value: 'yesterday'},
-      {label: 'Last 7 days', value: 'lastWeek'},
+      {label: 'Filter By Type', value: ''},
+      {label: 'Product Campaigns', value: 'product'},
+      {label: 'Collection Campaigns', value: 'collection'},
+      {label: 'Store Campaigns', value: 'all_store'},
     ];
     const [allSwitchChecked, setAllSwitchChecked] = useState(false);
+
     const handleChangeAllSwitchChecked = useCallback((newChecked) => setAllSwitchChecked(newChecked), []);
 
-    const [searchFieldValue, setSearchFieldValue] = useState('');
-
-    useEffect(() => {
-        setTableRows(tableRowsStatic.filter((value) => value[1].toLowerCase().includes(searchFieldValue.toLowerCase())));
-    },[searchFieldValue]);
     const logState = state => {
         console.log("Toggled:", state)
     }
@@ -80,7 +126,7 @@ function Campaign() {
             </Grid>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <h1 className="Polaris-Header-Title" style={{paddingBottom:"20px",paddingTop:"10px"}}>Campaign Builder</h1>
-        <Button primary onClick={()=>navigate('/campaign-builder')} >Create Campaign</Button>
+        <Button primary onClick={()=>navigate('/new-campaign')} >New Campaign +</Button>
       </div>
         <Grid>
             <Grid.Cell columnSpan={{xs: 12, sm: 6, md: 6, lg: 12, xl: 12}}>
@@ -117,87 +163,17 @@ function Campaign() {
                                 'text',
                                 'text',
                                 'text',
+                                'text',
                             ]}
                             headings={[
                                 'Compaign Name',
+                                'Applied On',
                                 'Duration',
                                 'Link',
                                 'Action',
                                 'Switch',
                             ]}
-                            // rows={tableRows && tableRows}
-                            rows={
-
-
-                                [
-                                    [
-                                    <div>
-                                        <Text variant="headingMd" as="h6">
-                                            Online store dashboard
-                                        </Text>
-                                        <p>Collection</p>
-                                    </div>,
-                                    "7 Oct - 13 Oct",
-
-                                    <Button plain><div style={{display:"flex"}}><Icon
-                                    source={DuplicateMinor}
-                                    color="base"
-                                  /> Copy Link</div></Button>,
-                                  <button className='customEditBtn' ><div style={{display:"flex"}}><div className='eitBtnIcon'><Icon
-                                  source={EditMajor}
-                                  color="base"
-                                /></div>  Edit</div></button>,
-                                <Toggle
-                                toggled={true}
-                                onClick={logState}
-                            />,
-                                    ],
-                                    [
-                                        <div>
-                                            <Text variant="headingMd" as="h6">
-                                                Online store dashboard
-                                            </Text>
-                                            <p>Collection</p>
-                                        </div>,
-                                        "7 Oct - 13 Oct",
-
-                                        <Button plain><div style={{display:"flex"}}><Icon
-                                        source={DuplicateMinor}
-                                        color="base"
-                                      /> Copy Link</div></Button>,
-                                      <button className='customEditBtn' ><div style={{display:"flex"}}><div className='eitBtnIcon'><Icon
-                                      source={EditMajor}
-                                      color="base"
-                                    /></div>  Edit</div></button>,
-                                    <Toggle
-                                    toggled={true}
-                                    onClick={logState}
-                                />,
-                                        ],
-                                        [
-                                            <div>
-                                                <Text variant="headingMd" as="h6">
-                                                    Online store dashboard
-                                                </Text>
-                                                <p>Collection</p>
-                                            </div>,
-                                            "7 Oct - 13 Oct",
-
-                                            <Button plain><div style={{display:"flex"}}><Icon
-                                            source={DuplicateMinor}
-                                            color="base"
-                                          /> Copy Link</div></Button>,
-                                          <button className='customEditBtn' ><div style={{display:"flex"}}><div className='eitBtnIcon'><Icon
-                                          source={EditMajor}
-                                          color="base"
-                                        /></div>  Edit</div></button>,
-                                        <Toggle
-                                        toggled={true}
-                                        onClick={logState}
-                                    />,
-                                            ],
-                                ]
-                            }
+                            rows={tableRows && tableRows}
                         />
                         </div>
                     </Card>

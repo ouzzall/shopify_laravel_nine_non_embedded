@@ -5,11 +5,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import vedio from '../components/imges/image_one.png';
 import { CircleTickMajor } from '@shopify/polaris-icons';
 function Dashboard() {
+
+    const navigate = useNavigate();
+
     return (
         <Page  >
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <h1 className="Polaris-Header-Title" style={{paddingBottom:"20px",paddingTop:"10px"}}>Dashboard</h1>
-        <Button primary >Create Campaign</Button>
+        <Button primary onClick={()=>navigate('/new-campaign')}>New Campaign +</Button>
       </div>
       <Grid>
         <Grid.Cell columnSpan={{xs: 4, sm: 3, md: 3, lg: 4, xl: 4}}>

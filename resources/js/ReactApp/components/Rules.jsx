@@ -1,25 +1,57 @@
-import {
-    Page,
-    DataTable,
-    Grid,
-    Card,
-    Text,
-    Button,
-    TextField,
-    Icon,
-} from "@shopify/polaris";
-import React from "react";
+import { Page, DataTable, Grid, Card, Text, Button, TextField, Icon } from "@shopify/polaris";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { SearchMajor } from "@shopify/polaris-icons";
 import "./css/style.css";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faTrash, faEye);
 
 function Rules() {
+
     const [searchFieldValue, setSearchFieldValue] = useState("");
+
+    const [tableRowsStatic,setTableRowsStatic] = useState([]);
+
+    const [tableRows,setTableRows] = useState([]);
+
+    const [totalQrCount,setTotalQrCount] = useState(0);
+
+    useEffect(() => {
+
+        fetch(`/get_rules_data`)
+        .then((response) => response.json())
+        .then((result) => {
+            console.log(result);
+            if(result.success == true)
+            {
+                const my_rows = [];
+
+                result.data.forEach(element => {
+                    my_rows.push([
+
+                    <div style={{marginTop:"13px"}}>{element.name}</div>,
+                    element.discount_type,
+                    element.upto_amount,
+
+                    <FontAwesomeIcon style={{fontSize:"18px",cursor:"pointer"}} icon="fa-solid fa-trash" />
+                    ]);
+                });
+
+                setTableRowsStatic(my_rows);
+                setTableRows(my_rows);
+                setTotalQrCount(result.count);
+            }
+
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+
+    },[])
 
     return (
         <Page fullWidth>
@@ -56,43 +88,15 @@ function Rules() {
                                         "text",
                                         "text",
                                         "text",
+                                        "text",
                                     ]}
                                     headings={[
                                         "Rule Name",
-                                        "Discount ",
+                                        "Discount Type",
+                                        "Discount",
                                         "Action",
                                     ]}
-                                    // rows={tableRows && tableRows}
-                                    rows={[
-                                        [
-                                            <div>
-                                                <Text
-                                                    variant="headingMd"
-                                                    as="h6"
-                                                >
-                                                    Discount Rule 1
-                                                </Text>
-                                            </div>,
-                                            "59 %",
-                                            <Button plain destructive>
-                                                Remove
-                                            </Button>,
-                                        ],
-                                        [
-                                            <div>
-                                                <Text
-                                                    variant="headingMd"
-                                                    as="h6"
-                                                >
-                                                    Discount Rule 2
-                                                </Text>
-                                            </div>,
-                                            "59",
-                                            <Button plain destructive>
-                                                Remove
-                                            </Button>,
-                                        ],
-                                    ]}
+                                    rows={tableRows && tableRows}
                                 />
                             </div>
                         </Card>
