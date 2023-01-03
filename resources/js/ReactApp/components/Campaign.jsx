@@ -23,7 +23,7 @@ library.add(
 
 function Campaign() {
 
-
+    const navigate = useNavigate();
 
     useEffect(() => {
 
