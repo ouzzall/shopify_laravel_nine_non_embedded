@@ -20,6 +20,7 @@ return new class extends Migration
             $table->longText('product_tags');
             $table->string('product_title');
             $table->string('product_handle');
+            $table->string('product_image');
             $table->longText('description');
             $table->timestamps();
         });

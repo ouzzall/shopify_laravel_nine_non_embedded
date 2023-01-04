@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('collection_title');
             $table->string('collection_handle');
+            $table->string('collection_image');
             $table->timestamps();
         });
     }

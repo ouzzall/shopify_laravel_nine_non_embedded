@@ -46,11 +46,23 @@ class CampaignController extends Controller
             // return $collections_list;
             //new new new new new
             foreach ($collections_list as $key => $value) {
+
+                $image_link = "";
+                if(isset($value->image))
+                {
+                    $image_link = $value->image->src;
+                }
+                else
+                {
+                    $image_link = '/default_image_src';
+                }
+
                 Collection::updateOrCreate([
                     'collection_id' => $value['id'],
                 ], [
                     'collection_title' => $value['title'],
                     'collection_handle' => $value['handle'],
+                    'collection_image' => $image_link,
                     'user_id' => $user->id
                 ]);
             }
@@ -108,15 +120,15 @@ class CampaignController extends Controller
                 ]);
                 foreach ($response['body']['products'] as $product) {
 
-                    // $image_link = "";
-                    // if($product->image)
-                    // {
-                    //     $image_link = $product->image->src;
-                    // }
-                    // else
-                    // {
-                    //     $image_link = '/default_image_src';
-                    // }
+                    $image_link = "";
+                    if(isset($product->image))
+                    {
+                        $image_link = $product->image->src;
+                    }
+                    else
+                    {
+                        $image_link = '/default_image_src';
+                    }
 
                     Product::updateOrCreate([
                         'product_id' => $product->id,
@@ -126,7 +138,7 @@ class CampaignController extends Controller
                         'product_handle' => $product['handle'],
                         'user_id' => $user->id,
                         'description' => "defauld description",
-                        // 'image_src' => $image_link,
+                        'product_image' => $image_link,
                     ]);
                 }
                 $link = $response['link'];
@@ -154,34 +166,12 @@ class CampaignController extends Controller
     {
         $products = Product::get();
         $collections = Collection::get();
-        $discount_rules = DiscountRule::get();
 
         return response()->json([
             'success' => true,
             'message' => 'Products and collections shown',
             'data1' => $products,
             'data2' => $collections,
-            'data3' => $discount_rules
-        ]);
-    }
-
-    public function add_new_discount_rule(Request $request)
-    {
-        // return $request;
-
-        $new_discount_rule = new DiscountRule;
-        $new_discount_rule->name = $request->rule_name;
-        $new_discount_rule->discount_type = $request->discount_type;
-        $new_discount_rule->upto_amount = $request->upto_amount;
-        $new_discount_rule->save();
-
-        $all_discount_rules = DiscountRule::get();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'New discount rule added',
-            'data' => $all_discount_rules,
-            'selected_discount_rule' => $new_discount_rule
         ]);
     }
 
@@ -191,11 +181,12 @@ class CampaignController extends Controller
 
         $new_discount_rule = new Campaign;
         $new_discount_rule->name = $request->campaign_name;
-        $new_discount_rule->discount_rule_id = $request->discount_rule_id;
         $new_discount_rule->discount_on = $request->discount_by;
         $new_discount_rule->discount_on_data = $request->further_option;
         $new_discount_rule->start_date = $request->start_date;
         $new_discount_rule->end_date = $request->end_date;
+        $new_discount_rule->discount_type = $request->discount_type;
+        $new_discount_rule->discount_tags = $request->discount_tags;
         $new_discount_rule->save();
 
         return response()->json([

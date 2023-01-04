@@ -1,10 +1,12 @@
-import {Page, Card, Button, Icon, TextField, Select, DatePicker} from '@shopify/polaris';
+import {Page, Card, Button, TextField, Select, DatePicker, Tag, Stack} from '@shopify/polaris';
 import {useState,useCallback, useEffect} from 'react';
 import React from 'react';
-import { MobilePlusMajor } from '@shopify/polaris-icons';
 import { useNavigate } from 'react-router-dom';
 
 function NewCampaign() {
+
+
+
 
     useEffect(() => {
 
@@ -21,11 +23,6 @@ function NewCampaign() {
                 if(temp.length > 0)
                     setSelectedFurtherOption(`${temp[0].value}`);
 
-                const temp2 = [];
-                data.data3.forEach(element => temp2.push({value:`${element.id}`, label:`${element.name}`}));
-                setPresetOptions(temp2);
-                if(temp2.length > 0)
-                    setSelectedPreset(`${temp2[0].value}`);
             } else if(data.success === false) {
 
             }
@@ -34,6 +31,24 @@ function NewCampaign() {
     },[]);
 
 
+
+
+
+    const [newTag, setNewTag] = useState("");
+    const [selectedTags, setSelectedTags] = useState([]);
+    const removeTagInside = useCallback(
+        (tag) => () => {
+            setSelectedTags((previousTags) =>
+            previousTags.filter((previousTag) => previousTag !== tag),
+            );
+        }, [],
+    );
+
+    const tagMarkup = selectedTags.map((option) => (
+        <Tag key={option} onRemove={removeTagInside(option)}>
+            {option}
+        </Tag>
+    ));
 
     const navigate = useNavigate();
 
@@ -72,27 +87,11 @@ function NewCampaign() {
     // console.log(myEndDate);
     const dateRange= `${myStartDate}  to  ${myEndDate}`;
 
-    const [selectedPreset, setSelectedPreset] = useState('');
-    const [presetOptions, setPresetOptions] = useState([]);
-
-    const [ruleName, setRuleName] = useState('');
-
     const [selectedDiscount, setSelectedDiscount] = useState('fixed');
     const discountOptions = [
         {label: 'Fixed Discount', value: 'fixed'},
         {label: 'Percentage', value: 'percentage'},
     ];
-
-    const [uptoFieldValue, setUptoFieldValue] = useState("");
-
-    const [newRuleShow, setNewRuleShow] = useState(false);
-
-    useEffect(() => {
-
-        console.log(selectedPreset);
-
-    },[selectedPreset]);
-
 
 
 
@@ -162,7 +161,8 @@ function NewCampaign() {
         formData.append("further_option", selectedFurtherOption);
         formData.append("start_date", startDate);
         formData.append("end_date", endDate);
-        formData.append("discount_rule_id", selectedPreset);
+        formData.append("discount_type", selectedDiscount);
+        formData.append("discount_tags", JSON.stringify(selectedTags));
 
         fetch( "/add_new_campaign", {
                 method: "POST",
@@ -181,40 +181,13 @@ function NewCampaign() {
         });
     }
 
-    const addNewRuleHandler = () => {
-        setNewRuleShow(true)
-        setRuleName("");
-        setSelectedDiscount("fixed");
-        setUptoFieldValue(0);
-    }
+    const addTagHandler = () => {
 
-    const newDiscountRuleHandler = () => {
+        let temp = [...selectedTags];
+        temp.push(newTag);
+        setNewTag("");
+        setSelectedTags(temp);
 
-        const formData = new FormData();
-
-        formData.append("rule_name", ruleName);
-        formData.append("discount_type", selectedDiscount);
-        formData.append("upto_amount", uptoFieldValue);
-
-        fetch( "/add_new_discount_rule", {
-                method: "POST",
-                // headers: { "content-Type": "application/json" },
-                body: formData,
-            }
-        )
-        .then((response) => response.json())
-        .then((data) => {
-            console.log(data);
-            if (data.success === true) {
-                const temp2 = [];
-                data.data.forEach(element => temp2.push({value:`${element.id}`, label:`${element.name}`}));
-                setPresetOptions(temp2);
-                if(temp2.length > 0)
-                    setSelectedPreset(`${data.selected_discount_rule.id}`);
-            } else if(data.success === false) {
-
-            }
-        });
     }
 
 
@@ -295,70 +268,40 @@ function NewCampaign() {
             <Card.Section>
                <div style={{paddingTop:"20px",borderTop: "1px solid #e1e3e5"}}>
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                        <p>Discount Rule</p>
-                        <div style={{width:"300px" ,display:"flex"}} >
-                            <div style={{width:"190px"}}>
-                            <Select
-                                    options={presetOptions}
-                                    onChange={(e) => setSelectedPreset(e)}
-                                    value={selectedPreset}
-                                />
-                            </div>
-                            <button style={{color:"#008060",background:"transparent",border:"none",fontSize:"14px",fontWeight:"600"}}>
-                                <div style={{display:"flex"}} onClick={addNewRuleHandler}>
-                                    <div style={{width:"18px",marginRight:"8px"}}>
-                                        <Icon
-                                            source={MobilePlusMajor}
-                                            color="primary"
-                                        />
-                                    </div>
-                                    Create new
-                                </div>
-                            </button>
-
-                        </div>
-                    </div>
-                </div>
-                {newRuleShow &&
-                    <div style={{background:"#F6F6F7",padding:"20px",marginTop:"20px",borderRadius:"4px"}}>
-                        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                            <p>Rule Name</p>
-                            <div style={{width:"300px"}}>
-                                <TextField
-                                value={ruleName}
-                                onChange={(e) => setRuleName(e)}
-                                autoComplete="off"
-                                />
-                            </div>
-                        </div>
-                        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:"20px"}}>
-                            <p>Select Discount Type</p>
-                            <div style={{width:"300px"}}>
+                        <p>Select Discount Type</p>
+                        <div style={{width:"300px"}}>
                             <Select
                                 options={discountOptions}
                                 onChange={(e) => setSelectedDiscount(e)}
                                 value={selectedDiscount}
-                                />
-                            </div>
-                        </div>
-                        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:"20px"}}>
-                            <p>Up to</p>
-                            <div style={{width:"300px"}}>
-                            <TextField
-                                type="number"
-                                prefix="$"
-                                value={uptoFieldValue}
-                                onChange={(e) => setUptoFieldValue(e)}
-                                helpText="Enter the amount in multiple of 5"
-                                autoComplete="off"
-                                />
-                            </div>
-                        </div>
-                        <div style={{display:"flex",justifyContent:"end",marginTop:"20px"}}>
-                            <Button primary onClick={newDiscountRuleHandler}>Save theme</Button>
+                            />
                         </div>
                     </div>
-                }
+                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:"20px"}}>
+                        <p>Discount Tags</p>
+                        <div style={{width:"300px" ,display:"flex"}} >
+                            <Card>
+                                <div style={{ padding: "20px" }}>
+                                    <div style={{ marginBottom: "5px", display: "flex", justifyContent: 'space-between' }}>
+                                        <div style={{width:"100%",marginRight:"15px"}}>
+                                            <TextField
+                                                value={newTag}
+                                                onChange={(e) => setNewTag(e)}
+                                                placeholder="Add tags here"
+                                                type="text"
+                                                style={{width:"400px"}}
+                                            />
+                                        </div>
+                                        <Button primary onClick={addTagHandler}>Add</Button>
+                                    </div>
+                                    <div className='tagsInput'>
+                                        <Stack spacing="tight">{tagMarkup}</Stack>
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
             </Card.Section>
 
             </div>
@@ -366,7 +309,7 @@ function NewCampaign() {
                 <div style={{display:"flex"}}>
                     <Button onClick={() => navigate("/campaigns")}>Cancel</Button>
                     <div style={{marginLeft:"10px"}}>
-                        <Button primary onClick={createCampaignHandler}>Create Compaign</Button>
+                        <Button primary onClick={createCampaignHandler}>Create Campaign</Button>
                     </div>
                 </div>
             </div>

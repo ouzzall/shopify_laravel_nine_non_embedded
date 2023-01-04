@@ -16,11 +16,12 @@ return new class extends Migration
         Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedBigInteger('discount_rule_id');
             $table->string('discount_on');
             $table->string('discount_on_data')->nullable();
             $table->string('start_date');
             $table->string('end_date');
+            $table->longText('discount_tags');
+            $table->string('discount_type');
             $table->timestamps();
         });
     }

@@ -10,7 +10,6 @@ import Campaign from "./Campaign";
 import Dashboard from "./Dashboard";
 import NewCampaign from "./NewCampaign";
 import React from "react";
-import Rules from "./Rules";
 
 const MysteryDiscountApp = () => {
 
@@ -26,7 +25,6 @@ const MysteryDiscountApp = () => {
                         <Route path="/" element={<Dashboard /> } />
                         <Route path="/campaigns" element={<Campaign /> } />
                         <Route path="/new-campaign" element={<NewCampaign /> } />
-                        <Route path="/rules" element={<Rules /> } />
                         <Route path="*" element={<Loading login={false} /> } />
                     </Routes>
                 </div>

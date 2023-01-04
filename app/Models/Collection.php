@@ -9,6 +9,6 @@ class Collection extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_id', 'collection_id','collection_title','collection_handle'
+        'user_id', 'collection_id','collection_title','collection_handle','collection_image'
     ];
 }
