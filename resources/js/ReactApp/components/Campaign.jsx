@@ -129,6 +129,7 @@ function Campaign() {
         <Button primary onClick={()=>navigate('/new-campaign')} >New Campaign +</Button>
       </div>
         <Grid>
+            {/* // */}
             <Grid.Cell columnSpan={{xs: 12, sm: 6, md: 6, lg: 12, xl: 12}}>
                 <div style={{marginBottom:"60px"}}>
                     <Card>
