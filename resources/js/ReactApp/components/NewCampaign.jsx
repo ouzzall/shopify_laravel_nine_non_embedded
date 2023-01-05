@@ -1,7 +1,8 @@
-import {Page, Card, Button, TextField, Select, DatePicker, Tag, Stack} from '@shopify/polaris';
+import {Page, Card, Button, TextField, Select, DatePicker, Tag, Stack, Tooltip, Text, Icon} from '@shopify/polaris';
 import {useState,useCallback, useEffect} from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { InfoMinor } from '@shopify/polaris-icons';
 
 function NewCampaign() {
 
@@ -60,9 +61,9 @@ function NewCampaign() {
 
     const [selectedApplyOnOptions, setSelectedApplyOnOptions] = useState('product');
     const applyOnOptions = [
-        {label: 'Product', value: 'product'},
-        {label: 'Collection', value: 'collection'},
-        {label: 'All Store', value: 'all_store'},
+        {label: 'Particular Product', value: 'product'},
+        {label: 'Particular Collection', value: 'collection'},
+        {label: 'Store Wide', value: 'all_store'},
     ];
 
     const [selectedFurtherOption, setSelectedFurtherOption] = useState("");
@@ -213,7 +214,7 @@ function NewCampaign() {
             </Card.Section>
             <Card.Section>
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                    <p>Apply Mystery discount by</p>
+                    <p>Apply Mystery Discount to</p>
                     <div style={{display:"flex"}}>
                         <div style={{width:"222px"}}>
                             <Select
@@ -278,7 +279,15 @@ function NewCampaign() {
                         </div>
                     </div>
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:"20px"}}>
-                        <p>Discount Tags</p>
+
+                        <div style={{display:"flex"}}>
+                            <p>Discount Tags</p>
+                            <Tooltip active content="This is info regarding this function.">
+                                <Text variant="bodyMd" fontWeight="bold" as="span">
+                                    <div style={{marginLeft:"10px"}}> <Icon source={InfoMinor} color="base" /> </div>
+                                </Text>
+                            </Tooltip>
+                        </div>
                         <div style={{width:"300px" ,display:"flex"}} >
                             <Card>
                                 <div style={{ padding: "20px" }}>

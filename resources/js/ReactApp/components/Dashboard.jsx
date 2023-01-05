@@ -1,4 +1,4 @@
-import {Page, Grid, Card, Text, Button, Banner, ProgressBar, Icon} from '@shopify/polaris';
+import {Page, Grid, Card, Text, Button, Banner, ProgressBar, Icon, TextField} from '@shopify/polaris';
 import {useEffect, useState,useCallback} from 'react';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -67,66 +67,58 @@ function Dashboard() {
     const navigate = useNavigate();
 
     return (
-        <Page  >
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <h1 className="Polaris-Header-Title" style={{paddingBottom:"20px",paddingTop:"10px"}}>Dashboard</h1>
-        <Button primary onClick={()=>navigate('/new-campaign')}>New Campaign +</Button>
-      </div>
-      <Grid>
-        <Grid.Cell columnSpan={{xs: 4, sm: 3, md: 3, lg: 4, xl: 4}}>
-          <Card title="Total Campaigns" sectioned>
-            <Text variant="heading3xl" as="h2">22</Text>
-          </Card>
-        </Grid.Cell>
-        <Grid.Cell columnSpan={{xs: 4, sm: 3, md: 3, lg: 4, xl: 4}}>
-            <Card title="Mystery discounts consumed" sectioned>
-            <Text variant="heading3xl" as="h2">10</Text>
-          </Card>
-        </Grid.Cell>
+        <Page>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"15px"}}>
+                <h1 className="Polaris-Header-Title" style={{}}>Dashboard</h1>
+                <div style={{display:"flex"}}>
+                    <div style={{marginRight:"10px"}}> <Button onClick={()=>navigate('/campaigns')}>View Campaigns</Button> </div>
+                    <Button primary onClick={()=>navigate('/new-campaign')}>New Campaign +</Button>
+                </div>
+            </div>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"flex-start",marginBottom:"15px"}}>
+                <div><Button>All</Button></div>
+                <div style={{marginLeft:"10px"}}><Button>Today</Button></div>
+                <div style={{marginLeft:"10px"}}><Button>Yesterday</Button></div>
+                <div style={{marginLeft:"10px"}}><Button>Tomorrow</Button></div>
+                <div style={{marginLeft:"10px"}}><Button>Select Date</Button></div>
+            </div>
+            <Grid>
+                <Grid.Cell columnSpan={{xs: 4, sm: 4, md: 4, lg: 4, xl: 4}}>
+                    <Card title="Views" sectioned>
+                        <Text variant="heading3xl" as="h2">22</Text>
+                    </Card>
+                    <Card title="Orders" sectioned>
+                        <Text variant="heading3xl" as="h2">10</Text>
+                    </Card>
+                    <Card title="Sales" sectioned>
+                        <Text variant="heading3xl" as="h2">8</Text>
+                    </Card>
+                </Grid.Cell>
+                <Grid.Cell columnSpan={{xs: 8, sm: 8, md: 8, lg: 8, xl: 8}}>
+                    <Card sectioned>
+                        <div style={{height:"365px"}}>
+                            <Line height={740} width={1200} data={data} />
+                        </div>
+                    </Card>
+                </Grid.Cell>
+                {/* <Grid.Cell columnSpan={{xs: 8, sm: 3, md: 3, lg: 8, xl: 8}}>
+                        <Banner
+                            title="How to create campaign?"
+                            status="info"
+                            onDismiss={() => {}}
+                            >
+                            <p><strong>Step 1</strong> create campaign</p>
+                            <p><strong>Step 2</strong> set application by type (product or collection or all stock)</p>
+                            <p><strong>Step 3</strong> set mystery discount rule</p>
+                    </Banner>
+                </Grid.Cell>
+                <Grid.Cell columnSpan={{xs: 4, sm: 3, md: 3, lg: 4, xl: 4}}>
 
-      <Grid.Cell columnSpan={{xs: 4, sm: 3, md: 3, lg: 4, xl: 4}}>
-          <Card title="Total orders (via app)" sectioned>
-            <Text variant="heading3xl" as="h2">8</Text>
-          </Card>
-        </Grid.Cell>
-        <Grid.Cell columnSpan={{xs: 4, sm: 3, md: 3, lg: 4, xl: 4}}>
-            <Card title="Campaigns by Product" sectioned>
-            <Text variant="heading3xl" as="h2">8</Text>
-          </Card>
-        </Grid.Cell>
-        <Grid.Cell columnSpan={{xs: 4, sm: 3, md: 3, lg: 4, xl: 4}}>
-            <Card title="Campaigns by Collection" sectioned>
-            <Text variant="heading3xl" as="h2">7</Text>
-          </Card>
-        </Grid.Cell>
-        <Grid.Cell columnSpan={{xs: 4, sm: 3, md: 3, lg: 4, xl: 4}}>
-            <Card title="Campaigns by Whole Store" sectioned>
-            <Text variant="heading3xl" as="h2">5</Text>
-          </Card>
-        </Grid.Cell>
-        <Grid.Cell columnSpan={{xs: 12, sm: 6, md: 6, lg: 12, xl: 12}}>
-            <Card sectioned>
-                <Line options={options} data={data} />
-            </Card>
-        </Grid.Cell>
-        <Grid.Cell columnSpan={{xs: 8, sm: 3, md: 3, lg: 8, xl: 8}}>
-                <Banner
-                    title="How to create campaign?"
-                    status="info"
-                    onDismiss={() => {}}
-                    >
-                    <p><strong>Step 1</strong> create campaign</p>
-                    <p><strong>Step 2</strong> set application by type (product or collection or all stock)</p>
-                    <p><strong>Step 3</strong> set mystery discount rule</p>
-            </Banner>
-        </Grid.Cell>
-        <Grid.Cell columnSpan={{xs: 4, sm: 3, md: 3, lg: 4, xl: 4}}>
+                        <img style={{marginTop:"-8px"}} src={vedio}/>
 
-                <img style={{marginTop:"-8px"}} src={vedio}/>
-
-        </Grid.Cell>
-      </Grid>
-    </Page>
-  );
+                </Grid.Cell> */}
+            </Grid>
+        </Page>
+    );
 }
 export default Dashboard;
