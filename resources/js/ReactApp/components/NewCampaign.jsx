@@ -1,8 +1,9 @@
-import {Page, Card, Button, TextField, Select, DatePicker, Tag, Stack, Tooltip, Text, Icon} from '@shopify/polaris';
+import {Page, Card, Button, TextField, Select, DatePicker, Tag, Stack, Tooltip, Text, Icon, Popover} from '@shopify/polaris';
 import {useState,useCallback, useEffect} from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { InfoMinor } from '@shopify/polaris-icons';
+import { ArrowRightMinor, InfoMinor } from '@shopify/polaris-icons';
+import "./css/style.css";
 
 function NewCampaign() {
 
@@ -69,25 +70,6 @@ function NewCampaign() {
     const [selectedFurtherOption, setSelectedFurtherOption] = useState("");
     const [furtherOptions, setFurtherOptions] = useState([]);
 
-    const [datePickerCheck, setDatePickerCheck] = useState(false);
-
-    const [{month, year}, setDate] = useState({month: new Date().getMonth(), year: new Date().getFullYear()});
-    // new Date("2010-02-18")
-    const [selectedDates, setSelectedDates] = useState({ start: new Date(), end: new Date() });
-    const handleMonthChange = useCallback((month, year) => setDate({month, year}), [],);
-
-    var date = new Date(selectedDates['start']),
-    mnth = ("0" + (date.getMonth() + 1)).slice(-2),
-    day = ("0" + date.getDate()).slice(-2);
-    const myStartDate = [date.getFullYear(), mnth, day].join("-");
-    var enddate = new Date(selectedDates['end']),
-    endMnth = ("0" + (enddate.getMonth() + 1)).slice(-2),
-    endDay = ("0" + enddate.getDate()).slice(-2);
-    const myEndDate = [enddate.getFullYear(), endMnth, endDay].join("-");
-    // console.log(myStartDate);
-    // console.log(myEndDate);
-    const dateRange= `${myStartDate}  to  ${myEndDate}`;
-
     const [selectedDiscount, setSelectedDiscount] = useState('fixed');
     const discountOptions = [
         {label: 'Fixed Discount', value: 'fixed'},
@@ -95,6 +77,38 @@ function NewCampaign() {
     ];
 
 
+
+
+    const [{month, year}, setDate] = useState({month: new Date().getMonth(), year: new Date().getFullYear()});
+    // new Date("2010-02-18")
+    const [datePickerPopoverActive, setDatePickerPopoverActive] = useState(false);
+    const setDatePickerTogglePopoverActive = useCallback(
+      () => setDatePickerPopoverActive((datePickerPopoverActive) => !datePickerPopoverActive),
+      [],
+    );
+
+    const [selectedDates, setSelectedDates] = useState({ start: new Date(), end: new Date() });
+    const handleMonthChange = useCallback((month, year) => setDate({month, year}), [],);
+
+    var date = new Date(selectedDates['start']);
+    var enddate = new Date(selectedDates['end']);
+
+    const monthArr = ["Jan","Feb","Mar","Apr","May","June","July","Aug","Sep","Oct","Nov","Dec"];
+    const myStartDate = date.getDate()+ " " +monthArr[date.getMonth()]+ " " +date.getFullYear();
+    const myEndDate = enddate.getDate()+ " " +monthArr[enddate.getMonth()]+ " " +enddate.getFullYear();
+
+    // console.log(myStartDate);
+    // console.log(myEndDate);
+
+    const dateRange= `${myStartDate} - ${myEndDate}`;
+
+    const activator = (
+        <div className="selectDate">
+            <Button  onClick={setDatePickerTogglePopoverActive} disclosure>
+            {dateRange}
+            </Button>
+      </div>
+    );
 
 
 
@@ -246,20 +260,43 @@ function NewCampaign() {
                 <div style={{paddingLeft:"40px",maxWidth: "610px"}}>
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderTop: "1px solid #e1e3e5",paddingTop:"20px"}}>
                         <p>Select Duration</p>
-                        <div style={{width:"300px"}}>
-                            <button  onClick={() => setDatePickerCheck(!datePickerCheck)} style={{background:"transparent",border:"1px solid #babfc4",borderRadius:"4px",padding:"9px 70px"}}>{dateRange}</button>
-                            { datePickerCheck &&
-                            <div className='datePickerDiv'>
-                                <DatePicker
-                                    month={month}
-                                    year={year}
-                                    onChange={setSelectedDates}
-                                    onMonthChange={handleMonthChange}
-                                    selected={selectedDates}
-                                    allowRange
-                                />
+                        <div>
+                            <div className='datePickerPopover'>
+                                <Popover
+                                    active={datePickerPopoverActive}
+                                    activator={activator}
+                                    autofocusTarget="first-node"
+                                    onClose={setDatePickerTogglePopoverActive}
+                                >
+                                    <div style={{padding:"20px"}}>
+                                    <div className='datepickerDropdownFields'>
+                                        <TextField
+                                            value={myStartDate}
+                                            autoComplete="off"
+                                        />
+                                            <div className='iconDateDropdown'>
+                                                <Icon
+                                                source={ArrowRightMinor}
+                                                color="base"
+                                                />
+                                            </div>
+                                        <TextField
+                                            value={myEndDate}
+                                            autoComplete="off"
+                                        />
+                                    </div>
+                                    <DatePicker
+                                        month={month}
+                                        year={year}
+                                        onChange={setSelectedDates}
+                                        onMonthChange={handleMonthChange}
+                                        selected={selectedDates}
+                                        allowRange
+                                        multiMonth
+                                    />
+                                    </div>
+                                </Popover>
                             </div>
-                            }
                         </div>
                     </div>
                 </div>
