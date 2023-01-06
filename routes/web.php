@@ -25,10 +25,6 @@ Route::get('get_create_campaign_data',[CampaignController::class,'get_create_cam
 Route::post('add_new_discount_rule',[CampaignController::class,'add_new_discount_rule'])->middleware(['verify.shopify']);
 Route::post('add_new_campaign',[CampaignController::class,'add_new_campaign'])->middleware(['verify.shopify']);
 
-Route::get('get_rules_data',[RulesController::class,'get_rules_data'])->middleware(['verify.shopify']);
-
 Route::get('get_all_campaigns',[CampaignController::class,'get_all_campaigns'])->middleware(['verify.shopify']);
-
-
 
 Route::view('/{any}', 'welcome')->where('any', '^(?!webhook).*$')->middleware(['verify.shopify'])->name('welcome');

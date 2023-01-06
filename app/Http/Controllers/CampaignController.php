@@ -3,15 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Campaign;
+use App\Models\CampaignDiscount;
 use App\Models\Collection;
 use App\Models\CollectionProduct;
 use App\Models\DiscountRule;
 use App\Models\Product;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CampaignController extends Controller
 {
@@ -173,6 +177,8 @@ class CampaignController extends Controller
     {
         $current_user = Auth::user();
 
+        $shop = User::find($current_user->id);
+
         $new_discount_rule = new Campaign;
         $new_discount_rule->name = $request->campaign_name;
         $new_discount_rule->discount_on = $request->discount_by;
@@ -183,61 +189,68 @@ class CampaignController extends Controller
         // $new_discount_rule->discount_tags = $request->discount_tags;
         $new_discount_rule->save();
 
-        // foreach ($$request->discount_tags as $key => $value) {
-        //     # code...
-        // }
+        $discount_type = "fixed_amount";
+        $target_selection_type = "all";
+        $product_ids_list = [];
+        $collection_ids_list = [];
 
+        if ($request->discount_type == "percentage") {
+            $discount_type = "percentage";
+        }
 
+        else if ($request->discount_type == "percentage") {
+            $discount_type = "fixed_amount";
+        }
 
+        if($request->discount_by == "product") {
+            $target_selection_type = "entitled";
+            $product_ids_list = [$request->further_option];
+        } else if($request->discount_by == "collection") {
+            $target_selection_type = "entitled";
+            $collection_ids_list = [$request->further_option];
+        }
 
+        foreach (json_decode($request->discount_tags) as $key => $value) {
 
+            $code = Str::random(8);
 
+            $createPriceRule = $shop->api()->rest('POST', '/admin/api/2021-10/price_rules.json', [
+                'price_rule' => [
+                    'title' => "$request->campaign_name $key",
+                    'target_type' => "line_item",
+                    'target_selection' => $target_selection_type,
+                    'allocation_method' => 'across',
+                    'usage_limit' => 1,
+                    'once_per_customer' => true,
+                    "value_type" => $discount_type,
+                    "value" => "-$value",
+                    'customer_selection' => 'all',
+                    'entitled_variant_ids' => [],
+                    "entitled_product_ids" => $product_ids_list,
+                    "entitled_collection_ids" => $collection_ids_list,
+                    'starts_at' => Carbon::createFromFormat('Y-m-d H:i:s', "$request->start_date 00:00:00"),
+                    'ends_at' => Carbon::createFromFormat('Y-m-d H:i:s', "$request->end_date 23:59:59"),
+                ]
+            ]);
 
+            // Log::info(json_encode($createPriceRule));
 
+            $priceRule = $createPriceRule['body']['price_rule'];
+            $discountCode = $shop->api()->rest('POST', '/admin/api/2022-01/price_rules/' . $priceRule['id'] . '/discount_codes.json', [
+                'discount_code' => [
+                    'code' => $code,
+                ]
+            ]);
 
+            // Log::info(json_encode($discountCode));
 
-        // if ($request->all_rewards == true) {
-
-        //     $createPriceRule = getShop()->api()->rest('POST', '/admin/api/2021-10/price_rules.json', [
-        //         'price_rule' => [
-        //             'title' => $code,
-        //             'target_type' => "line_item",
-        //             'target_selection' => "entitled",
-        //             'allocation_method' => 'across',
-        //             'usage_limit' => 1,
-        //             'once_per_customer' => true,
-        //             "value_type" => "percentage",
-        //             "value" => "-100.0",
-        //             'customer_selection' => 'all',
-        //             'entitled_variant_ids' => explode(",", $request->variant_ids),
-        //             'starts_at' => Carbon::now(),
-        //             'ends_at' => Carbon::now()->addDays(30),
-        //         ]
-        //     ]);
-
-        //     $priceRule = $createPriceRule['body']['price_rule'];
-        //     $discountCode = getShop()->api()->rest('POST', '/admin/api/2022-01/price_rules/' . $priceRule['id'] . '/discount_codes.json', [
-        //         'discount_code' => [
-        //             'code' => $code,
-        //         ]
-        //     ]);
-
-        //     $str['status'] = true;
-        //     $str['message'] = "DISCOUNT CODE GENERATED IN DISCOUNTS";
-        //     $str['data'] = $code;
-        //     return $str;
-
-        // }
-
-
-
-
-
-
-
-
-
-
+            $new_discount_code = new CampaignDiscount;
+            $new_discount_code->campaign_id = $new_discount_rule->id;
+            $new_discount_code->discount_code_id = $createPriceRule['body']['price_rule']['id'];
+            $new_discount_code->price_rule_id = $discountCode['body']['discount_code']['id'];
+            $new_discount_code->discount_code = $code;
+            $new_discount_code->save();
+        }
 
         return response()->json([
             'success' => true,

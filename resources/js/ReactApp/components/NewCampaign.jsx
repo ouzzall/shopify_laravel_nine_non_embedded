@@ -20,7 +20,7 @@ function NewCampaign() {
                 setFetchResponse([data.data1,data.data2]);
 
                 const temp = [];
-                data.data1.forEach(element => temp.push({value:`${element.id}`, label:`${element.product_title}`}));
+                data.data1.forEach(element => temp.push({value:`${element.product_id}`, label:`${element.product_title}`}));
                 setFurtherOptions(temp);
                 if(temp.length > 0)
                     setSelectedFurtherOption(`${temp[0].value}`);
@@ -142,7 +142,7 @@ function NewCampaign() {
             setShowProductCollection(true);
             const temp = [];
             console.log(fetchResponse);
-            fetchResponse[1].forEach(element => temp.push({value: `${element.id}`, label:`${element.collection_title}`}));
+            fetchResponse[1].forEach(element => temp.push({value: `${element.collection_id}`, label:`${element.collection_title}`}));
             setFurtherOptions(temp);
             if(temp.length > 0)
                 setSelectedFurtherOption(`${temp[0].value}`);
@@ -151,7 +151,7 @@ function NewCampaign() {
             setShowProductCollection(true);
             const temp = [];
             console.log(fetchResponse);
-            fetchResponse[0].forEach(element => temp.push({value: `${element.id}`, label:`${element.product_title}`}));
+            fetchResponse[0].forEach(element => temp.push({value: `${element.product_id}`, label:`${element.product_title}`}));
             setFurtherOptions(temp);
             if(temp.length > 0)
                 setSelectedFurtherOption(`${temp[0].value}`);
