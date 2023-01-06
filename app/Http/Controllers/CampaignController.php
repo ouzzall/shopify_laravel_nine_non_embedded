@@ -48,12 +48,9 @@ class CampaignController extends Controller
             foreach ($collections_list as $key => $value) {
 
                 $image_link = "";
-                if(isset($value->image))
-                {
+                if (isset($value->image)) {
                     $image_link = $value->image->src;
-                }
-                else
-                {
+                } else {
                     $image_link = '/default_image_src';
                 }
 
@@ -121,12 +118,9 @@ class CampaignController extends Controller
                 foreach ($response['body']['products'] as $product) {
 
                     $image_link = "";
-                    if(isset($product->image))
-                    {
+                    if (isset($product->image)) {
                         $image_link = $product->image->src;
-                    }
-                    else
-                    {
+                    } else {
                         $image_link = '/default_image_src';
                     }
 
@@ -177,7 +171,7 @@ class CampaignController extends Controller
 
     public function add_new_campaign(Request $request)
     {
-        // return $request;
+        $current_user = Auth::user();
 
         $new_discount_rule = new Campaign;
         $new_discount_rule->name = $request->campaign_name;
@@ -186,8 +180,64 @@ class CampaignController extends Controller
         $new_discount_rule->start_date = $request->start_date;
         $new_discount_rule->end_date = $request->end_date;
         $new_discount_rule->discount_type = $request->discount_type;
-        $new_discount_rule->discount_tags = $request->discount_tags;
+        // $new_discount_rule->discount_tags = $request->discount_tags;
         $new_discount_rule->save();
+
+        // foreach ($$request->discount_tags as $key => $value) {
+        //     # code...
+        // }
+
+
+
+
+
+
+
+
+
+
+        // if ($request->all_rewards == true) {
+
+        //     $createPriceRule = getShop()->api()->rest('POST', '/admin/api/2021-10/price_rules.json', [
+        //         'price_rule' => [
+        //             'title' => $code,
+        //             'target_type' => "line_item",
+        //             'target_selection' => "entitled",
+        //             'allocation_method' => 'across',
+        //             'usage_limit' => 1,
+        //             'once_per_customer' => true,
+        //             "value_type" => "percentage",
+        //             "value" => "-100.0",
+        //             'customer_selection' => 'all',
+        //             'entitled_variant_ids' => explode(",", $request->variant_ids),
+        //             'starts_at' => Carbon::now(),
+        //             'ends_at' => Carbon::now()->addDays(30),
+        //         ]
+        //     ]);
+
+        //     $priceRule = $createPriceRule['body']['price_rule'];
+        //     $discountCode = getShop()->api()->rest('POST', '/admin/api/2022-01/price_rules/' . $priceRule['id'] . '/discount_codes.json', [
+        //         'discount_code' => [
+        //             'code' => $code,
+        //         ]
+        //     ]);
+
+        //     $str['status'] = true;
+        //     $str['message'] = "DISCOUNT CODE GENERATED IN DISCOUNTS";
+        //     $str['data'] = $code;
+        //     return $str;
+
+        // }
+
+
+
+
+
+
+
+
+
+
 
         return response()->json([
             'success' => true,

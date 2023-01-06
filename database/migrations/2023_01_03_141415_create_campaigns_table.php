@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('discount_on_data')->nullable();
             $table->string('start_date');
             $table->string('end_date');
-            $table->longText('discount_tags');
+            // $table->longText('discount_tags');
             $table->string('discount_type');
             $table->boolean('status')->default(false);
             $table->timestamps();
