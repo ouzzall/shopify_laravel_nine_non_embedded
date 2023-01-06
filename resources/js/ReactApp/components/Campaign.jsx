@@ -1,8 +1,16 @@
-import {Page, DataTable, Grid, Card, Text, Banner, Button, TextField, Icon, Select, Checkbox, Tabs, Tooltip, Badge} from '@shopify/polaris';
+import {
+    ChoiceList,
+    TextField,
+    Card,
+    Filters,
+    DataTable,
+    Page,
+} from "@shopify/polaris";
+import { Grid, Text, Banner, Button, Icon, Select, Checkbox, Tabs, Tooltip, Badge} from '@shopify/polaris';
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useCallback } from 'react';
-import { DuplicateMinor, EditMajor,InfoMinor, MinusMinor, SearchMajor } from '@shopify/polaris-icons';
+import { CollectionsMajor, DuplicateMinor, EditMajor,InfoMinor, LinkMinor, MinusMinor, ProductsMajor, ProductsMinor, SearchMajor, StoreMinor } from '@shopify/polaris-icons';
 import "./css/style.css";
 import "./css/toggle.css";
 import vedio from '../components/imges/image_one.png';
@@ -14,12 +22,6 @@ import {
     faTrash,
     faPencil
 } from "@fortawesome/free-solid-svg-icons";
-
-library.add(
-    faTrash,
-    faEye,
-    faPencil
-);
 
 function Campaign() {
 
@@ -47,24 +49,22 @@ function Campaign() {
 
                     my_rows.push([
 
-                    <div>
-                        <Text variant="headingMd" as="h6">
-                            {element.name}
-                        </Text>
-                        <p>{element.discount_on}</p>
-                    </div>,
+                    element.name,
 
-                    <p>{element.discount_on}</p>,
+                    element.discount_on == "product" ? <Badge value="product" status='attention'> <div style={{ paddingLeft: "4px", display: "flex", paddingRight: "4px" ,paddingTop: "1px" }}> <span style={{width: "11px", marginRight: "5px", marginBottom: "-3px", paddingTop: "3px", height: "21px"}}> <Icon source={ProductsMajor} color="base" /> </span> Product </div> </Badge> :
+                    element.discount_on == "collection" ? <Badge value="collection" status='success'> <div style={{ paddingLeft: "4px", display: "flex", paddingRight: "4px" ,paddingTop: "1px" }}> <span style={{width: "11px", marginRight: "5px", marginBottom: "-3px", paddingTop: "3px", height: "21px"}}> <Icon source={CollectionsMajor} color="base" /> </span> Collection </div> </Badge> :
+                    element.discount_on == "all_store" ? <Badge value="all_store" status='critical'> <div style={{ paddingLeft: "4px", display: "flex", paddingRight: "4px" ,paddingTop: "1px" }}> <span style={{width: "11px", marginRight: "5px", marginBottom: "-3px", paddingTop: "3px", height: "21px"}}> <Icon source={StoreMinor} color="base" /> </span> Store Wide </div> </Badge> :
+                    null,
 
-                    <div style={{display:"flex"}}> <Badge status="success">{myStartDate}</Badge> <div style={{width:"50px"}}> <Icon source={MinusMinor} color="base" /> </div> <Badge status="info">{myendDate}</Badge></div>,
+                    <div style={{display:"flex"}}> <Badge>{myStartDate}</Badge> <div style={{width:"50px"}}> <Icon source={MinusMinor} color="base" /> </div> <Badge>{myendDate}</Badge></div>,
 
-                    <Button plain>
-                        <div style={{display:"flex"}}>
-                            <Icon source={DuplicateMinor} color="base" /> Copy Link
+                    <Button size="slim" outline>
+                        <div style={{display:"flex",paddingRight:"3px"}}>
+                            <span style={{width: "16px", marginRight: "5px", marginBottom: "-3px"}}> <Icon source={LinkMinor} color="base" /> </span> Copy Link
                         </div>
                     </Button>,
 
-                    <Toggle toggled={true} onClick={logState} />,
+                    <Toggle toggled={element.status} onClick={(e) => console.log(e.target.checked)} />,
 
                     <div style={{display:"flex"}}>
                         <div style={{marginRight:"10px"}}> <Button size="slim"> Edit </Button> </div>
@@ -75,7 +75,6 @@ function Campaign() {
 
                 setTableRowsStatic(my_rows);
                 setTableRows(my_rows);
-                setTotalQrCount(result.count);
             }
 
         })
@@ -85,34 +84,19 @@ function Campaign() {
 
     },[])
 
-    const [searchFieldValue, setSearchFieldValue] = useState("");
+    const [availability, setAvailability] = useState([]);
+    const [queryValue, setQueryValue] = useState("");
 
     const [tableRowsStatic,setTableRowsStatic] = useState([]);
 
     const [tableRows,setTableRows] = useState([]);
-
-    const [totalQrCount,setTotalQrCount] = useState(0);
-
-    const [selectedFilterBy, setSelectedFilterBy] = useState('today');
-
-    const handleSelectChange = useCallback((value) => setSelectedFilterBy(value), []);
-
-    const filterByOptions = [
-      {label: 'Filter By Type', value: ''},
-      {label: 'Product Campaigns', value: 'product'},
-      {label: 'Collection Campaigns', value: 'collection'},
-      {label: 'Store Campaigns', value: 'all_store'},
-    ];
-    const [allSwitchChecked, setAllSwitchChecked] = useState(false);
-
-    const handleChangeAllSwitchChecked = useCallback((newChecked) => setAllSwitchChecked(newChecked), []);
 
     const logState = state => {
         console.log("Toggled:", state)
     }
 
     const [selectedTab, setSelected] = useState(0);
-    const handleTabChange = useCallback((selectedTabIndex) => {setSelected(selectedTabIndex); console.log(selectedTabIndex); },[],);
+    const handleTabChange = useCallback((selectedTabIndex) => setSelected(selectedTabIndex) ,[],);
 
     const tabs = [
         {
@@ -129,86 +113,175 @@ function Campaign() {
         }
     ];
 
+    const handleAvailabilityChange = useCallback(
+        (value) => setAvailability(value),
+        []
+    );
+    const handleFiltersQueryChange = useCallback(
+        (value) => setQueryValue(value),
+        []
+    );
+    const handleAvailabilityRemove = useCallback(
+        () => setAvailability([]),
+        []
+    );
+    const handleQueryValueRemove = useCallback(() => setQueryValue(""), []);
+    const handleFiltersClearAll = useCallback(() => {
+        handleAvailabilityRemove();
+        handleQueryValueRemove();
+    }, [
+        handleAvailabilityRemove,
+        handleQueryValueRemove,
+    ]);
+
+    const filters = [
+        {
+            key: "filterbytype",
+            label: "Filter by Type",
+            filter: (
+                <ChoiceList
+                    title="Campaign Type"
+                    titleHidden
+                    choices={[
+                        {label: 'Product Campaigns', value: 'product'},
+                        {label: 'Collection Campaigns', value: 'collection'},
+                        {label: 'Store Wide Campaigns', value: 'all_store'},
+                    ]}
+                    selected={availability || []}
+                    onChange={handleAvailabilityChange}
+                    allowMultiple
+                />
+            ),
+            // shortcut: false,
+        },
+    ];
+
+    const appliedFilters = [];
+    if (!isEmpty(availability)) {
+        const key = "filterbytype";
+        appliedFilters.push({
+            key,
+            label: disambiguateLabel(key, availability),
+            onRemove: handleAvailabilityRemove,
+        });
+    }
+
+    useEffect(() => {
+
+        // console.log(availability);
+        // console.log(queryValue);
+        // console.log(selectedTab);
+        // console.log(tableRowsStatic);
+
+        let realRows =  tableRowsStatic;
+
+        if(selectedTab == 0) {
+            setTableRows(tableRowsStatic);
+        }
+        else if(selectedTab == 1) {
+            realRows = realRows.filter((value) => value[4].props.toggled == 1);
+            setTableRows(realRows);
+        }
+        else if(selectedTab == 2) {
+            realRows = realRows.filter((value) => value[4].props.toggled == 0);
+            setTableRows(realRows);
+        }
+
+        realRows = realRows.filter((value) => value[0].toLowerCase().includes(queryValue.toLowerCase()))
+        setTableRows(realRows);
+
+        console.log(availability);
+        console.log(realRows);
+
+        if(availability.length == 1)
+            realRows = realRows.filter((value) => value[1].props.value == availability[0])
+
+        if(availability.length == 2)
+            realRows = realRows.filter((value) => value[1].props.value == availability[0] || value[1].props.value == availability[1])
+
+        if(availability.length == 3)
+            realRows = realRows.filter((value) => value[1].props.value == availability[0] || value[1].props.value == availability[1] || value[1].props.value == availability[2])
+
+        setTableRows(realRows);
+
+        // if(selectedFilterBy != "filterByType")
+        // {
+        //     // setTableRows(tableRowsStatic.filter((value) => value[0].toLowerCase().includes(searchFieldValue.toLowerCase()) && value[1] == selectedFilterBy ));
+        // }
+
+    },[queryValue,availability,selectedTab]);
+
     return (
         <Page fullWidth>
-            {/* <Grid>
-                <Grid.Cell columnSpan={{xs: 8, sm: 3, md: 3, lg: 8, xl: 8}}>
-                    <Banner
-                        title="How to create campaign?"
-                        status="info"
-                        onDismiss={() => {}}
-                        >
-                        <p><strong>Step 1</strong> create campaign</p>
-                        <p><strong>Step 2</strong> set application by type (product or collection or all stock)</p>
-                        <p><strong>Step 3</strong> set mystery discount rule</p>
-                    </Banner>
-                </Grid.Cell>
-                <Grid.Cell columnSpan={{xs: 4, sm: 3, md: 3, lg: 4, xl: 4}}>
-
-                        <img style={{marginTop:"-8px"}} src={vedio}/>
-
-                </Grid.Cell>
-            </Grid> */}
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                    <h1 className="Polaris-Header-Title" style={{paddingBottom:"20px",paddingTop:"10px"}}>Campaign Builder</h1>
-                    <Button primary onClick={()=>navigate('/new-campaign')} >New Campaign +</Button>
+                <h1 className="Polaris-Header-Title" style={{paddingBottom:"20px",paddingTop:"10px"}}>Campaign Builder</h1>
+                <Button primary onClick={()=>navigate('/new-campaign')} >New Campaign +</Button>
             </div>
             <Grid>
                 <Grid.Cell columnSpan={{xs: 12, sm: 6, md: 6, lg: 12, xl: 12}}>
-                    <div style={{marginBottom:"60px"}}>
+                    <div style={{ height: "568px" }}>
                         <Card>
                             <Tabs tabs={tabs} selected={selectedTab} onSelect={handleTabChange}>
                             </Tabs>
-                            <div style={{display:"flex",padding: "20px", paddingBottom:"0px",alignItems:"center",}}>
-                                <TextField
-                                    type="text"
-                                    value={searchFieldValue}
-                                    onChange={(e) => setSearchFieldValue(e)}
-                                    prefix={<Icon source={SearchMajor}color="base"/>}
-                                    autoComplete="off"
+                            <Card.Section>
+                                <Filters
+                                    queryValue={queryValue}
+                                    filters={filters}
+                                    appliedFilters={appliedFilters}
+                                    onQueryChange={handleFiltersQueryChange}
+                                    onQueryClear={handleQueryValueRemove}
+                                    onClearAll={handleFiltersClearAll}
                                 />
-                                <div style={{marginLeft: "10px",width:"200px"}}>
-                                    <Select
-                                        options={filterByOptions}
-                                        onChange={handleSelectChange}
-                                        value={selectedFilterBy}
-                                    />
-                                </div>
-                                <div style={{marginLeft:"10px"}}><Button>Select Date</Button></div>
-                            </div>
-                            <div className='camplainTable'>
-                                <DataTable
-                                    columnContentTypes={[
-                                        'text',
-                                        'text',
-                                        'text',
-                                        'text',
-                                        'text',
-                                        'text',
-                                    ]}
-                                    headings={[
-                                        'Campaign Name',
-                                        'Applied On',
-                                        <div> Live Date <span style={{fontSize:"12px",color:"#898b8c"}}> (Duration) </span> </div>,
-                                        <div style={{display:"flex"}}>
-                                            <div> Link </div>
-                                            <Tooltip active content="This is info regarding this function.">
-                                                <Text variant="bodyMd" fontWeight="bold" as="span">
-                                                    <div style={{marginLeft:"10px"}}> <Icon source={InfoMinor} color="base" /> </div>
-                                                </Text>
-                                            </Tooltip>
-                                        </div>,
-                                        'On/Off',
-                                        'Edit',
-                                    ]}
-                                    rows={tableRows && tableRows}
-                                />
-                            </div>
+                            </Card.Section>
+                            <DataTable
+                                columnContentTypes={[
+                                    'text',
+                                    'text',
+                                    'text',
+                                    'text',
+                                    'text',
+                                    'text',
+                                ]}
+                                headings={[
+                                    'Campaign Name',
+                                    'Campaign Type',
+                                    <div> Live Date <span style={{fontSize:"12px",color:"#898b8c"}}> (Duration) </span> </div>,
+                                    <div style={{display:"flex"}}>
+                                        <div> Link </div>
+                                        <Tooltip active content="This is info regarding this function.">
+                                            <Text variant="bodyMd" fontWeight="bold" as="span">
+                                                <div style={{marginLeft:"10px"}}> <Icon source={InfoMinor} color="base" /> </div>
+                                            </Text>
+                                        </Tooltip>
+                                    </div>,
+                                    'On/Off',
+                                    'Actions',
+                                ]}
+                                rows={tableRows && tableRows}
+                            />
                         </Card>
                     </div>
                 </Grid.Cell>
             </Grid>
         </Page>
     );
+
+    function disambiguateLabel(key, value) {
+        switch (key) {
+            case "filterbytype":
+                return `Filtered by ${value.map((val) =>  val).join(", ")}`;
+            default:
+                return value;
+        }
+    }
+
+    function isEmpty(value) {
+        if (Array.isArray(value)) {
+            return value.length === 0;
+        } else {
+            return value === "" || value == null;
+        }
+    }
 }
+
 export default Campaign;
