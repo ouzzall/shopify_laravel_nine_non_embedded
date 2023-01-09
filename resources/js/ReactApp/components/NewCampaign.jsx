@@ -110,6 +110,7 @@ function NewCampaign() {
       </div>
     );
 
+    const [saveLoading, setSaveLoading] = useState(false);
 
 
     const syncHandler = () => {
@@ -160,6 +161,8 @@ function NewCampaign() {
 
     const createCampaignHandler = () => {
 
+        setSaveLoading(true);
+
         var date = new Date(selectedDates['start']),
         mnth = ("0" + (date.getMonth() + 1)).slice(-2),
         day = ("0" + date.getDate()).slice(-2);
@@ -190,8 +193,9 @@ function NewCampaign() {
             console.log(data);
             if (data.success === true) {
                 navigate("/campaigns");
+                setSaveLoading(false);
             } else if(data.success === false) {
-
+                setSaveLoading(false);
             }
         });
     }
@@ -357,7 +361,9 @@ function NewCampaign() {
                 <div style={{display:"flex"}}>
                     <Button onClick={() => navigate("/campaigns")}>Discard</Button>
                     <div style={{marginLeft:"10px"}}>
-                        <Button primary onClick={createCampaignHandler}>Save</Button>
+                        {saveLoading ?
+                        <Button primary loading>Save</Button> :
+                        <Button primary onClick={createCampaignHandler}>Save</Button> }
                     </div>
                 </div>
            </div>

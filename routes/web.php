@@ -38,5 +38,6 @@ Route::post('update_existing_campaign',[CampaignController::class,'update_existi
 
 Route::post('make_campaign_duplicate',[CampaignController::class,'make_campaign_duplicate'])->middleware(['verify.shopify']);
 
+Route::get('delete_campaign',[CampaignController::class,'delete_campaign'])->middleware(['verify.shopify']);
 
 Route::view('/{any}', 'welcome')->where('any', '^(?!webhook).*$')->middleware(['verify.shopify'])->name('welcome');

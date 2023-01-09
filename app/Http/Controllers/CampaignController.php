@@ -422,4 +422,27 @@ class CampaignController extends Controller
             'message' => 'Campaign Duplicated Successfully',
         ]);
     }
+
+    public function delete_campaign(Request $request)
+    {
+        // return $request;
+        $current_user = Auth::user();
+        $shop = User::find($current_user->id);
+
+        $campaign_discounts = CampaignDiscount::where('campaign_id',$request->campaign_id)->get();
+
+        foreach ($campaign_discounts as $key => $value) {
+            $shop->api()->rest('delete', '/admin/api/2022-07/price_rules/' . $value->price_rule_id . '/discount_codes/' . $value->discount_code_id . '.json', []);
+            $shop->api()->rest('delete', '/admin/api/2022-04/price_rules/' . $value->price_rule_id . '.json', []);
+        }
+
+        CampaignDiscount::where('campaign_id', $request->campaign_id)->delete();
+
+        Campaign::find($request->campaign_id)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Campaign Deleted Successfully',
+        ]);
+    }
 }

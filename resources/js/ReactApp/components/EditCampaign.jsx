@@ -1,4 +1,4 @@
-import {Page, Card, Button, TextField, Select, DatePicker, Tag, Stack, Tooltip, Text, Icon, Popover} from '@shopify/polaris';
+import {Page, Card, Button, TextField, Select, DatePicker, Tag, Stack, Tooltip, Text, Icon, Popover, TextContainer, Modal} from '@shopify/polaris';
 import {useState,useCallback, useEffect} from 'react';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -32,6 +32,7 @@ function EditCampaign() {
                     setFurtherOptions(temp2);
                 }
 
+                setDeletingCampaignName(data.data3.name);
                 setCampaignName(data.data3.name);
                 setSelectedFurtherOption(data.data3.discount_on_data);
                 setSelectedApplyOnOptions(data.data3.discount_on);
@@ -126,8 +127,12 @@ function EditCampaign() {
     );
 
     const [duplicateLoading, setDuplicateLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
+    const [active, setActive] = useState(false);
+    const handleChange = useCallback(() => setActive(!active), [active]);
 
+    const [deletingCampaignName, setDeletingCampaignName] = useState("");
 
     const syncHandler = () => {
         fetch( "/sync_store", {
@@ -248,9 +253,51 @@ function EditCampaign() {
         });
     }
 
+    const deleteCampaignHandler = () => {
+        setDeleteLoading(true);
+
+        fetch( `/delete_campaign?campaign_id=${id}`)
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+            if (data.success === true) {
+                setDeleteLoading(false);
+                navigate("/campaigns");
+            } else if(data.success === false) {
+                setDeleteLoading(false);
+            }
+        });
+    }
 
     return (
       <Page>
+        <div>
+            <Modal
+                open={active}
+                onClose={handleChange}
+                title={`Delete ${deletingCampaignName}?`}
+            >
+                <Modal.Section>
+                <TextContainer>
+                    <p>
+                        Are you sure you want to delete the campaign <strong>{deletingCampaignName}</strong>? This can't be undone.
+                    </p>
+                </TextContainer>
+                </Modal.Section>
+                <Modal.Section>
+                    <div style={{display:"flex",justifyContent:"flex-end"}}>
+                        <div style={{display:"flex"}}>
+                            <Button onClick={() => setActive(false)}>Cancel</Button>
+                            <div style={{marginLeft:"10px"}}>
+                                {deleteLoading ?
+                                <Button destructive loading disabled>Delete Campaign</Button> :
+                                <Button destructive onClick={deleteCampaignHandler}>Delete Campaign</Button> }
+                            </div>
+                        </div>
+                    </div>
+                </Modal.Section>
+            </Modal>
+        </div>
         <Card title="Update Campaign" >
             {/* <Card.Section>
             </Card.Section> */}
@@ -398,17 +445,17 @@ function EditCampaign() {
            <div style={{display:"flex",justifyContent:"space-between"}}>
                 <div style={{display:"flex"}}>
                     {duplicateLoading ?
-                    <Button loading> Duplicate </Button> :
+                    <Button loading disabled> Duplicate </Button> :
                     <Button onClick={duplicateHandler}> Duplicate </Button>}
                     <div style={{marginLeft:"10px"}}>
-                        <Button outline destructive> Delete </Button>
+                        <Button outline destructive onClick={() => setActive(true)}> Delete </Button>
                     </div>
                 </div>
 
                 <div style={{display:"flex"}}>
                     <Button onClick={() => navigate("/campaigns")}>Cancel</Button>
                     <div style={{marginLeft:"10px"}}>
-                        <Button primary onClick={updateCampaignHandler}>Save</Button>
+                        <Button primary onClick={(updateCampaignHandler)}>Save</Button>
                     </div>
                 </div>
            </div>
