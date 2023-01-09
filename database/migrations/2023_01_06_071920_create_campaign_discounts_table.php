@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('discount_code_id');
             $table->unsignedBigInteger('price_rule_id');
             $table->string('discount_code');
+            $table->string('discount_tag');
             $table->timestamps();
         });
     }

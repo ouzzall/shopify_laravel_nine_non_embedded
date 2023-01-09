@@ -5,10 +5,11 @@ import {
     Filters,
     DataTable,
     Page,
+    Spinner,
 } from "@shopify/polaris";
 import { Grid, Text, Banner, Button, Icon, Select, Checkbox, Tabs, Tooltip, Badge} from '@shopify/polaris';
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAsyncError, useNavigate } from 'react-router-dom';
 import { useState, useCallback } from 'react';
 import { CollectionsMajor, DuplicateMinor, EditMajor,InfoMinor, LinkMinor, MinusMinor, ProductsMajor, ProductsMinor, SearchMajor, StoreMinor } from '@shopify/polaris-icons';
 import "./css/style.css";
@@ -26,6 +27,8 @@ import {
 function Campaign() {
 
     const navigate = useNavigate();
+    const [reload, setReload] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
 
@@ -49,6 +52,8 @@ function Campaign() {
 
                     my_rows.push([
 
+                    element.id,
+
                     element.name,
 
                     element.discount_on == "product" ? <Badge value="product" status='attention'> <div style={{ paddingLeft: "4px", display: "flex", paddingRight: "4px" ,paddingTop: "1px" }}> <span style={{width: "11px", marginRight: "5px", marginBottom: "-3px", paddingTop: "3px", height: "21px"}}> <Icon source={ProductsMajor} color="base" /> </span> Product </div> </Badge> :
@@ -64,11 +69,11 @@ function Campaign() {
                         </div>
                     </Button>,
 
-                    <Toggle toggled={element.status} onClick={(e) => console.log(e.target.checked)} />,
+                    <Toggle toggled={element.status} onClick={(e) => changeStatusHandler(e,element)} />,
 
                     <div style={{display:"flex"}}>
-                        <div style={{marginRight:"10px"}}> <Button size="slim"> Edit </Button> </div>
-                        <Button size="slim" primary> Duplicate </Button>
+                        <div style={{marginRight:"10px"}} onClick={() => navigate(`/edit-campaign/${element.id}` )}> <Button size="slim"> Edit </Button> </div>
+                        <Button size="slim" primary onClick={() => makeDuplicateHandler(element)}> Duplicate </Button>
                     </div>
                     ]);
                 });
@@ -82,7 +87,7 @@ function Campaign() {
             console.log(err);
         });
 
-    },[])
+    },[reload])
 
     const [availability, setAvailability] = useState([]);
     const [queryValue, setQueryValue] = useState("");
@@ -179,37 +184,88 @@ function Campaign() {
             setTableRows(tableRowsStatic);
         }
         else if(selectedTab == 1) {
-            realRows = realRows.filter((value) => value[4].props.toggled == 1);
+            realRows = realRows.filter((value) => value[5].props.toggled == 1);
             setTableRows(realRows);
         }
         else if(selectedTab == 2) {
-            realRows = realRows.filter((value) => value[4].props.toggled == 0);
+            realRows = realRows.filter((value) => value[5].props.toggled == 0);
             setTableRows(realRows);
         }
 
-        realRows = realRows.filter((value) => value[0].toLowerCase().includes(queryValue.toLowerCase()))
+        realRows = realRows.filter((value) => value[1].toLowerCase().includes(queryValue.toLowerCase()))
         setTableRows(realRows);
 
         console.log(availability);
         console.log(realRows);
 
         if(availability.length == 1)
-            realRows = realRows.filter((value) => value[1].props.value == availability[0])
+            realRows = realRows.filter((value) => value[2].props.value == availability[0])
 
         if(availability.length == 2)
-            realRows = realRows.filter((value) => value[1].props.value == availability[0] || value[1].props.value == availability[1])
+            realRows = realRows.filter((value) => value[2].props.value == availability[0] || value[2].props.value == availability[1])
 
         if(availability.length == 3)
-            realRows = realRows.filter((value) => value[1].props.value == availability[0] || value[1].props.value == availability[1] || value[1].props.value == availability[2])
+            realRows = realRows.filter((value) => value[2].props.value == availability[0] || value[2].props.value == availability[1] || value[2].props.value == availability[2])
 
         setTableRows(realRows);
 
-        // if(selectedFilterBy != "filterByType")
-        // {
-        //     // setTableRows(tableRowsStatic.filter((value) => value[0].toLowerCase().includes(searchFieldValue.toLowerCase()) && value[1] == selectedFilterBy ));
-        // }
-
     },[queryValue,availability,selectedTab]);
+
+    const changeStatusHandler = (e,element) => {
+
+        // console.log(e,element)
+
+        setLoading(true);
+
+        const formData = new FormData();
+        formData.append("new_status", e.target.checked);
+        formData.append("campaign_id", element.id);
+
+        fetch( "/change_campaign_status", {
+            method: "POST",
+            // headers: { "content-Type": "application/json" },
+            body: formData,
+            }
+        )
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+            if (data.success === true) {
+                // setReload(!reload);
+                setLoading(false);
+            } else if(data.success === false) {
+
+            }
+        });
+
+
+    }
+
+    const makeDuplicateHandler = (element) => {
+
+        setLoading(true);
+
+        const formData = new FormData();
+        formData.append("campaign_id", element.id);
+
+        fetch( "/make_campaign_duplicate", {
+            method: "POST",
+            // headers: { "content-Type": "application/json" },
+            body: formData,
+            }
+        )
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+            if (data.success === true) {
+                setReload(!reload);
+                setLoading(false);
+            } else if(data.success === false) {
+
+            }
+        });
+
+    }
 
     return (
         <Page fullWidth>
@@ -233,6 +289,10 @@ function Campaign() {
                                     onClearAll={handleFiltersClearAll}
                                 />
                             </Card.Section>
+                            {loading ? <div style={{boxShadow: "0 1px 4px -2px grey", display: "flex", backgroundColor: "#ebf9fc", padding: "7px", paddingBottom: "3px", margin: "0px 21px", marginBottom: "3px", borderRadius: "3px", marginTop: "-20px"}}>
+                                <Spinner accessibilityLabel="Small spinner example" size="small" />
+                                <div style={{fontSize:"14.5px", marginLeft:"10px"}}> Loading campaigns... </div>
+                            </div> : null }
                             <DataTable
                                 columnContentTypes={[
                                     'text',
@@ -241,8 +301,10 @@ function Campaign() {
                                     'text',
                                     'text',
                                     'text',
+                                    'text',
                                 ]}
                                 headings={[
+                                    'ID',
                                     'Campaign Name',
                                     'Campaign Type',
                                     <div> Live Date <span style={{fontSize:"12px",color:"#898b8c"}}> (Duration) </span> </div>,

@@ -47,7 +47,7 @@ function CustomBar() {
         width: 124,
         topBarSource: "",
         contextualSaveBarSource: "",
-        url: "https://57cf-2400-adc5-1b3-b500-acce-75ac-d425-9450.in.ngrok.io/admin",
+        url: "https://397f-2400-adc5-1b3-b500-d481-8864-8652-e9f2.in.ngrok.io/admin",
         accessibilityLabel: "Mystery Discount",
     };
 
