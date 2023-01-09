@@ -341,16 +341,21 @@ return [
     */
 
     'webhooks' => [
-        /*
-            [
-                'topic' => env('SHOPIFY_WEBHOOK_1_TOPIC', 'ORDERS_CREATE'),
-                'address' => env('SHOPIFY_WEBHOOK_1_ADDRESS', 'https://some-app.com/webhook/orders-create')
-            ], [
-                'topic' => env('SHOPIFY_WEBHOOK_2_TOPIC', 'APP_PURCHASES_ONE_TIME_UPDATE'),
-                'address' => env('SHOPIFY_WEBHOOK_2_ADDRESS', 'https://some-app.com/webhook/purchase'),
-            ]
-            ...
-        */
+
+        [
+            'topic' => env('SHOPIFY_WEBHOOK_1_TOPIC', ''),
+            'address' => env('SHOPIFY_WEBHOOK_1_ADDRESS', '')
+        ], [
+            'topic' => env('SHOPIFY_WEBHOOK_2_TOPIC', ''),
+            'address' => env('SHOPIFY_WEBHOOK_2_ADDRESS', ''),
+        ], [
+            'topic' => env('SHOPIFY_WEBHOOK_3_TOPIC', ''),
+            'address' => env('SHOPIFY_WEBHOOK_3_ADDRESS', ''),
+        ], [
+            'topic' => env('SHOPIFY_WEBHOOK_4_TOPIC', ''),
+            'address' => env('SHOPIFY_WEBHOOK_4_ADDRESS', ''),
+        ],
+
     ],
 
     /*

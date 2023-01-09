@@ -209,14 +209,20 @@ class CampaignController extends Controller
 
     public function get_create_campaign_data()
     {
+        $current_user = Auth::user();
+        $shop = User::find($current_user->id);
+
         $products = Product::get();
         $collections = Collection::get();
+
+        $response = $shop->api()->rest('get', '/admin/api/2023-01/webhooks.json', []);
 
         return response()->json([
             'success' => true,
             'message' => 'Products and collections shown',
             'data1' => $products,
             'data2' => $collections,
+            'data3' => $response,
         ]);
     }
 
