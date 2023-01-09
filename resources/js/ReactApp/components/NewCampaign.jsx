@@ -303,63 +303,65 @@ function NewCampaign() {
 
             </Card.Section>
             <div style={{paddingLeft:"40px",maxWidth: "650px"}}>
-            <Card.Section>
-               <div style={{paddingTop:"20px",borderTop: "1px solid #e1e3e5"}}>
-                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                        <p>Select Discount Type</p>
-                        <div style={{width:"300px"}}>
-                            <Select
-                                options={discountOptions}
-                                onChange={(e) => setSelectedDiscount(e)}
-                                value={selectedDiscount}
-                            />
+                <Card.Section>
+                <div style={{paddingTop:"20px",borderTop: "1px solid #e1e3e5"}}>
+                        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                            <p>Select Discount Type</p>
+                            <div style={{width:"300px"}}>
+                                <Select
+                                    options={discountOptions}
+                                    onChange={(e) => setSelectedDiscount(e)}
+                                    value={selectedDiscount}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:"20px"}}>
+                        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:"20px"}}>
 
-                        <div style={{display:"flex"}}>
-                            <p>Discount Tags</p>
-                            <Tooltip active content="This is info regarding this function.">
-                                <Text variant="bodyMd" fontWeight="bold" as="span">
-                                    <div style={{marginLeft:"10px"}}> <Icon source={InfoMinor} color="base" /> </div>
-                                </Text>
-                            </Tooltip>
-                        </div>
-                        <div style={{width:"300px" ,display:"flex"}} >
-                            <Card>
-                                <div style={{ padding: "20px" }}>
-                                    <div style={{ marginBottom: "5px", display: "flex", justifyContent: 'space-between' }}>
-                                        <div style={{width:"100%",marginRight:"15px"}}>
-                                            <TextField
-                                                value={newTag}
-                                                onChange={(e) => setNewTag(e)}
-                                                placeholder="Add tags here"
-                                                type="text"
-                                                style={{width:"400px"}}
-                                            />
+                            <div style={{display:"flex"}}>
+                                <p>Discount Tags</p>
+                                <Tooltip active content="This is info regarding this function.">
+                                    <Text variant="bodyMd" fontWeight="bold" as="span">
+                                        <div style={{marginLeft:"10px"}}> <Icon source={InfoMinor} color="base" /> </div>
+                                    </Text>
+                                </Tooltip>
+                            </div>
+                            <div style={{width:"300px" ,display:"flex"}} >
+                                <Card>
+                                    <div style={{ padding: "20px" }}>
+                                        <div style={{ marginBottom: "5px", display: "flex", justifyContent: 'space-between' }}>
+                                            <div style={{width:"100%",marginRight:"15px"}}>
+                                                <TextField
+                                                    value={newTag}
+                                                    onChange={(e) => setNewTag(e)}
+                                                    placeholder="Add tags here"
+                                                    type="text"
+                                                    style={{width:"400px"}}
+                                                />
+                                            </div>
+                                            <Button primary onClick={addTagHandler}>Add</Button>
                                         </div>
-                                        <Button primary onClick={addTagHandler}>Add</Button>
+                                        <div className='tagsInput'>
+                                            <Stack spacing="tight">{tagMarkup}</Stack>
+                                        </div>
                                     </div>
-                                    <div className='tagsInput'>
-                                        <Stack spacing="tight">{tagMarkup}</Stack>
-                                    </div>
-                                </div>
-                            </Card>
+                                </Card>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </Card.Section>
-
-            </div>
-            <div style={{display:"flex",justifyContent:"flex-end",paddingLeft:"40px",paddingRight:"40px",paddingBottom:"20px",marginTop:"40px"}}>
-                <div style={{display:"flex"}}>
-                    <Button onClick={() => navigate("/campaigns")}>Cancel</Button>
-                    <div style={{marginLeft:"10px"}}>
-                        <Button primary onClick={createCampaignHandler}>Create Campaign</Button>
-                    </div>
-                </div>
+                </Card.Section>
             </div>
         </Card>
+
+        <div style={{paddingTop:"20px",borderTop: "1px solid #e1e3e5",marginTop:"16px", marginBottom:"13px"}}>
+           <div style={{display:"flex",justifyContent:"flex-end"}}>
+                <div style={{display:"flex"}}>
+                    <Button onClick={() => navigate("/campaigns")}>Discard</Button>
+                    <div style={{marginLeft:"10px"}}>
+                        <Button primary onClick={createCampaignHandler}>Save</Button>
+                    </div>
+                </div>
+           </div>
+        </div>
       </Page>
     );
 }
