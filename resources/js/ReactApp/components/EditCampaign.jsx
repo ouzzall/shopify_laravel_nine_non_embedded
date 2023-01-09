@@ -194,8 +194,9 @@ function EditCampaign() {
         formData.append("end_date", endDate);
         formData.append("discount_type", selectedDiscount);
         formData.append("discount_tags", JSON.stringify(selectedTags));
+        formData.append("editing_check", true);
 
-        fetch( "/update_existing_campaign", {
+        fetch( "/add_new_campaign", {
                 method: "POST",
                 // headers: { "content-Type": "application/json" },
                 body: formData,

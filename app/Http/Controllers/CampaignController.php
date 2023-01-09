@@ -16,9 +16,57 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use stdClass;
 
 class CampaignController extends Controller
 {
+    private function manage_campaign($request,$shop,$target_selection_type,$discount_type,$product_ids_list,
+    $collection_ids_list,$start_date_inside,$end_date_inside,$discount_rule)
+    {
+        foreach (json_decode($request->discount_tags) as $key => $value) {
+
+            $code = Str::random(8);
+
+            $createPriceRule = $shop->api()->rest('POST', '/admin/api/2021-10/price_rules.json', [
+                'price_rule' => [
+                    'title' => "$request->campaign_name $key",
+                    'target_type' => "line_item",
+                    'target_selection' => $target_selection_type,
+                    'allocation_method' => 'across',
+                    'usage_limit' => 1,
+                    'once_per_customer' => true,
+                    "value_type" => $discount_type,
+                    "value" => "-$value",
+                    'customer_selection' => 'all',
+                    'entitled_variant_ids' => [],
+                    "entitled_product_ids" => $product_ids_list,
+                    "entitled_collection_ids" => $collection_ids_list,
+                    'starts_at' => $start_date_inside,
+                    'ends_at' => $end_date_inside,
+                ]
+            ]);
+
+            // Log::info(json_encode($createPriceRule));
+
+            $priceRule = $createPriceRule['body']['price_rule'];
+            $discountCode = $shop->api()->rest('POST', '/admin/api/2022-01/price_rules/' . $priceRule['id'] . '/discount_codes.json', [
+                'discount_code' => [
+                    'code' => $code,
+                ]
+            ]);
+
+            // Log::info(json_encode($discountCode));
+
+            $new_discount_code = new CampaignDiscount;
+            $new_discount_code->campaign_id = $discount_rule->id;
+            $new_discount_code->discount_code_id = $discountCode['body']['discount_code']['id'];
+            $new_discount_code->price_rule_id = $createPriceRule['body']['price_rule']['id'];
+            $new_discount_code->discount_code = $code;
+            $new_discount_code->discount_tag = $value;
+            $new_discount_code->save();
+        }
+    }
+
     public function sync_store(Request $request)
     {
         $user = User::where('name', Auth::user()->name)->first();
@@ -175,18 +223,54 @@ class CampaignController extends Controller
 
     public function add_new_campaign(Request $request)
     {
+        // return $request;
+
         $current_user = Auth::user();
         $shop = User::find($current_user->id);
 
-        $new_discount_rule = new Campaign;
-        $new_discount_rule->name = $request->campaign_name;
-        $new_discount_rule->discount_on = $request->discount_by;
-        $new_discount_rule->discount_on_data = $request->further_option;
-        $new_discount_rule->start_date = $request->start_date;
-        $new_discount_rule->end_date = $request->end_date;
-        $new_discount_rule->discount_type = $request->discount_type;
-        $new_discount_rule->discount_tags = $request->discount_tags;
-        $new_discount_rule->save();
+        //INITIAL VARIABLES
+        $discount_rule = "";
+        $message = "New Campaign Created Successfully";
+        $start_date_inside = Carbon::now()->subDays(10);
+        $end_date_inside = Carbon::now()->subDays(10);
+
+        if (isset($request->duplicate_check)) {
+            $discount_rule = Campaign::find($request->campaign_id);
+        }
+
+        if (isset($request->editing_check)) {
+            $discount_rule = Campaign::find($request->campaign_id);
+        } else {
+            $discount_rule = new Campaign;
+        }
+
+        $discount_rule->name = $request->campaign_name;
+        $discount_rule->discount_on = $request->discount_by;
+        $discount_rule->discount_on_data = $request->further_option;
+        $discount_rule->start_date = $request->start_date;
+        $discount_rule->end_date = $request->end_date;
+        $discount_rule->discount_type = $request->discount_type;
+        $discount_rule->discount_tags = $request->discount_tags;
+        $discount_rule->save();
+
+        if (isset($request->editing_check)) {
+
+            $delete_discount_rules = CampaignDiscount::where('campaign_id', $request->campaign_id)->get();
+
+            foreach ($delete_discount_rules as $key => $value) {
+                $shop->api()->rest('delete', '/admin/api/2022-07/price_rules/' . $value->price_rule_id . '/discount_codes/' . $value->discount_code_id . '.json', []);
+                $shop->api()->rest('delete', '/admin/api/2022-04/price_rules/' . $value->price_rule_id . '.json', []);
+            }
+
+            CampaignDiscount::where('campaign_id', $request->campaign_id)->delete();
+
+            if ($discount_rule->status == true) {
+                $start_date_inside = $request->start_date;
+                $end_date_inside = $request->end_date;
+            }
+
+            $message = "Existing campaign updated successfully";
+        }
 
         $discount_type = "fixed_amount";
         $target_selection_type = "all";
@@ -195,66 +279,24 @@ class CampaignController extends Controller
 
         if ($request->discount_type == "percentage") {
             $discount_type = "percentage";
-        }
-
-        else if ($request->discount_type == "percentage") {
+        } else if ($request->discount_type == "fixed") {
             $discount_type = "fixed_amount";
         }
 
-        if($request->discount_by == "product") {
+        if ($request->discount_by == "product") {
             $target_selection_type = "entitled";
             $product_ids_list = [$request->further_option];
-        } else if($request->discount_by == "collection") {
+        } else if ($request->discount_by == "collection") {
             $target_selection_type = "entitled";
             $collection_ids_list = [$request->further_option];
         }
 
-        foreach (json_decode($request->discount_tags) as $key => $value) {
-
-            $code = Str::random(8);
-
-            $createPriceRule = $shop->api()->rest('POST', '/admin/api/2021-10/price_rules.json', [
-                'price_rule' => [
-                    'title' => "$request->campaign_name $key",
-                    'target_type' => "line_item",
-                    'target_selection' => $target_selection_type,
-                    'allocation_method' => 'across',
-                    'usage_limit' => 1,
-                    'once_per_customer' => true,
-                    "value_type" => $discount_type,
-                    "value" => "-$value",
-                    'customer_selection' => 'all',
-                    'entitled_variant_ids' => [],
-                    "entitled_product_ids" => $product_ids_list,
-                    "entitled_collection_ids" => $collection_ids_list,
-                    'starts_at' => Carbon::now()->subDays(10),
-                    'ends_at' => Carbon::now()->subDays(10),
-                ]
-            ]);
-
-            // Log::info(json_encode($createPriceRule));
-
-            $priceRule = $createPriceRule['body']['price_rule'];
-            $discountCode = $shop->api()->rest('POST', '/admin/api/2022-01/price_rules/' . $priceRule['id'] . '/discount_codes.json', [
-                'discount_code' => [
-                    'code' => $code,
-                ]
-            ]);
-
-            // Log::info(json_encode($discountCode));
-
-            $new_discount_code = new CampaignDiscount;
-            $new_discount_code->campaign_id = $new_discount_rule->id;
-            $new_discount_code->discount_code_id = $discountCode['body']['discount_code']['id'];
-            $new_discount_code->price_rule_id = $createPriceRule['body']['price_rule']['id'];
-            $new_discount_code->discount_code = $code;
-            $new_discount_code->discount_tag = $value;
-            $new_discount_code->save();
-        }
+        $this->manage_campaign($request,$shop,$target_selection_type,$discount_type,$product_ids_list,
+        $collection_ids_list,$start_date_inside,$end_date_inside,$discount_rule);
 
         return response()->json([
             'success' => true,
-            'message' => 'New Campaign Created Successfully',
+            'message' =>  $message,
         ]);
     }
 
@@ -276,9 +318,9 @@ class CampaignController extends Controller
         $shop = User::find($current_user->id);
 
         $campaign = Campaign::find($request->campaign_id);
-        $campaign_discounts = CampaignDiscount::where('campaign_id',$request->campaign_id)->get();
+        $campaign_discounts = CampaignDiscount::where('campaign_id', $request->campaign_id)->get();
 
-        if($request->new_status == 'true') {
+        if ($request->new_status == 'true') {
             $start_date = $campaign->start_date;
             $end_date = $campaign->end_date;
         } else {
@@ -288,7 +330,7 @@ class CampaignController extends Controller
 
         foreach ($campaign_discounts as $key => $value) {
 
-            $createPriceRule = $shop->api()->rest('PUT', '/admin/api/2021-10/price_rules/'.$value->price_rule_id.'.json', [
+            $createPriceRule = $shop->api()->rest('PUT', '/admin/api/2021-10/price_rules/' . $value->price_rule_id . '.json', [
                 'price_rule' => [
                     'starts_at' => $start_date,
                     'ends_at' => $end_date,
@@ -315,7 +357,7 @@ class CampaignController extends Controller
         $products = Product::get();
         $collections = Collection::get();
         $campaign = Campaign::find($request->campaign_id);
-        $campaign_discounts = CampaignDiscount::where('campaign_id',$request->campaign_id)->get();
+        $campaign_discounts = CampaignDiscount::where('campaign_id', $request->campaign_id)->get();
 
         return response()->json([
             'success' => true,
@@ -327,117 +369,52 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function update_existing_campaign(Request $request)
+    public function make_campaign_duplicate(Request $request)
     {
         // return $request;
-
         $current_user = Auth::user();
         $shop = User::find($current_user->id);
 
-        $new_discount_rule = Campaign::find($request->campaign_id);
-        $new_discount_rule->name = $request->campaign_name;
-        $new_discount_rule->discount_on = $request->discount_by;
-        $new_discount_rule->discount_on_data = $request->further_option;
-        $new_discount_rule->start_date = $request->start_date;
-        $new_discount_rule->end_date = $request->end_date;
-        $new_discount_rule->discount_type = $request->discount_type;
-        $new_discount_rule->discount_tags = $request->discount_tags;
-        $new_discount_rule->save();
+        $start_date_inside = Carbon::now()->subDays(10);
+        $end_date_inside = Carbon::now()->subDays(10);
 
-        $delete_discount_rules = CampaignDiscount::where('campaign_id',$request->campaign_id)->get();
+        $discount_rule = Campaign::find($request->campaign_id);
 
-        foreach ($delete_discount_rules as $key => $value) {
-            $shop->api()->rest('delete', '/admin/api/2022-07/price_rules/'.$value->price_rule_id.'/discount_codes/'.$value->discount_code_id.'.json', []);
-            $shop->api()->rest('delete', '/admin/api/2022-04/price_rules/'.$value->price_rule_id.'.json', []);
-        }
-
-        CampaignDiscount::where('campaign_id',$request->campaign_id)->delete();
+        $d_discount_rule = new Campaign;
+        $d_discount_rule->name = $discount_rule->name." Copy";
+        $d_discount_rule->discount_on = $discount_rule->discount_on;
+        $d_discount_rule->discount_on_data = $discount_rule->discount_on_data;
+        $d_discount_rule->start_date = $discount_rule->start_date;
+        $d_discount_rule->end_date = $discount_rule->end_date;
+        $d_discount_rule->discount_type = $discount_rule->discount_type;
+        $d_discount_rule->discount_tags = $discount_rule->discount_tags;
+        $d_discount_rule->save();
 
         $discount_type = "fixed_amount";
         $target_selection_type = "all";
         $product_ids_list = [];
         $collection_ids_list = [];
 
-        if ($request->discount_type == "percentage") {
+        if ($discount_rule->discount_type == "percentage") {
             $discount_type = "percentage";
-        }
-
-        else if ($request->discount_type == "percentage") {
+        } else if ($discount_rule->discount_type == "fixed") {
             $discount_type = "fixed_amount";
         }
 
-        if($request->discount_by == "product") {
+        if ($discount_rule->discount_on == "product") {
             $target_selection_type = "entitled";
-            $product_ids_list = [$request->further_option];
-        } else if($request->discount_by == "collection") {
+            $product_ids_list = [$discount_rule->discount_on_data];
+        } else if ($discount_rule->discount_on == "collection") {
             $target_selection_type = "entitled";
-            $collection_ids_list = [$request->further_option];
+            $collection_ids_list = [$discount_rule->discount_on_data];
         }
 
-        $start_date_inside = "";
-        $end_date_inside = "";
+        $request = new stdClass;
+        $request->discount_tags = $discount_rule->discount_tags;
+        $request->campaign_name = $discount_rule->name." Copy";
 
-        if($new_discount_rule->status == true) {
-            $start_date_inside = $request->start_date;
-            $end_date_inside = $request->end_date;
-        } else {
-            $start_date_inside = Carbon::now()->subDays(10);
-            $end_date_inside = Carbon::now()->subDays(10);
-        }
-
-
-        foreach (json_decode($request->discount_tags) as $key => $value) {
-
-            $code = Str::random(8);
-
-            $createPriceRule = $shop->api()->rest('POST', '/admin/api/2021-10/price_rules.json', [
-                'price_rule' => [
-                    'title' => "$request->campaign_name $key",
-                    'target_type' => "line_item",
-                    'target_selection' => $target_selection_type,
-                    'allocation_method' => 'across',
-                    'usage_limit' => 1,
-                    'once_per_customer' => true,
-                    "value_type" => $discount_type,
-                    "value" => "-$value",
-                    'customer_selection' => 'all',
-                    'entitled_variant_ids' => [],
-                    "entitled_product_ids" => $product_ids_list,
-                    "entitled_collection_ids" => $collection_ids_list,
-                    'starts_at' => $start_date_inside,
-                    'ends_at' => $end_date_inside,
-                ]
-            ]);
-
-            // Log::info(json_encode($createPriceRule));
-
-            $priceRule = $createPriceRule['body']['price_rule'];
-            $discountCode = $shop->api()->rest('POST', '/admin/api/2022-01/price_rules/' . $priceRule['id'] . '/discount_codes.json', [
-                'discount_code' => [
-                    'code' => $code,
-                ]
-            ]);
-
-            // Log::info(json_encode($discountCode));
-
-            $new_discount_code = new CampaignDiscount;
-            $new_discount_code->campaign_id = $new_discount_rule->id;
-            $new_discount_code->discount_code_id = $discountCode['body']['discount_code']['id'];
-            $new_discount_code->price_rule_id = $createPriceRule['body']['price_rule']['id'];
-            $new_discount_code->discount_code = $code;
-            $new_discount_code->discount_tag = $value;
-            $new_discount_code->save();
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Existing campaign updated successfully',
-        ]);
-    }
-
-    public function make_campaign_duplicate(Request $request)
-    {
-        return $request;
+        $this->manage_campaign($request,$shop,$target_selection_type,$discount_type,$product_ids_list,
+        $collection_ids_list,$start_date_inside,$end_date_inside,$discount_rule);
 
         return response()->json([
             'success' => true,
