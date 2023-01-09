@@ -6,7 +6,6 @@ use App\Models\Campaign;
 use App\Models\CampaignDiscount;
 use App\Models\Collection;
 use App\Models\CollectionProduct;
-use App\Models\DiscountRule;
 use App\Models\Product;
 use App\Models\User;
 use Carbon\Carbon;
