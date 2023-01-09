@@ -413,6 +413,8 @@ class CampaignController extends Controller
         $request->discount_tags = $discount_rule->discount_tags;
         $request->campaign_name = $discount_rule->name." Copy";
 
+        $discount_rule = $d_discount_rule;
+
         $this->manage_campaign($request,$shop,$target_selection_type,$discount_type,$product_ids_list,
         $collection_ids_list,$start_date_inside,$end_date_inside,$discount_rule);
 
