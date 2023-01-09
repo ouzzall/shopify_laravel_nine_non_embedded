@@ -231,7 +231,7 @@ function Campaign() {
         .then((data) => {
             console.log(data);
             if (data.success === true) {
-                // setReload(!reload);
+                setReload(!reload);
                 setLoading(false);
             } else if(data.success === false) {
 

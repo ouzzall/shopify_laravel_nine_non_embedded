@@ -7,7 +7,7 @@ export const Toggle = ({ label, toggled, onClick }) => {
         <div id='customToggle'>
             <label>
                 {/* checked is the real setup */}
-                <input type="checkbox" defaultChecked={toggled} onClick={onClick} />
+                <input type="checkbox" checked={toggled} onClick={onClick} />
                 <span />
                 <strong>{label}</strong>
             </label>
