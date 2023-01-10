@@ -5,6 +5,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Osiset\ShopifyApp\Objects\Values\ShopDomain;
 use stdClass;
 
@@ -49,6 +50,9 @@ class ProductsDeleteJob implements ShouldQueue
     {
         // Convert domain
         $this->shopDomain = ShopDomain::fromNative($this->shopDomain);
+
+        Log::info("PRODUCT DELETE");
+        Log::info(json_encode($this->shopDomain));
 
         // Do what you wish with the data
         // Access domain name as $this->shopDomain->toNative()
