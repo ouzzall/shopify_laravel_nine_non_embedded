@@ -6,6 +6,8 @@ import {
     DataTable,
     Page,
     Spinner,
+    Toast,
+    Frame,
 } from "@shopify/polaris";
 import { Grid, Text, Banner, Button, Icon, Select, Checkbox, Tabs, Tooltip, Badge} from '@shopify/polaris';
 import React, { useEffect } from 'react';
@@ -63,7 +65,7 @@ function Campaign() {
 
                     <div style={{display:"flex"}}> <Badge>{myStartDate}</Badge> <div style={{width:"50px"}}> <Icon source={MinusMinor} color="base" /> </div> <Badge>{myendDate}</Badge></div>,
 
-                    <Button size="slim" outline>
+                    <Button size="slim" outline onClick={() => {navigator.clipboard.writeText(`https://${shopNm}?camp=${element.id}&page=app_dis`); setActive(true);}}>
                         <div style={{display:"flex",paddingRight:"3px"}}>
                             <span style={{width: "16px", marginRight: "5px", marginBottom: "-3px"}}> <Icon source={LinkMinor} color="base" /> </span> Copy Link
                         </div>
@@ -102,6 +104,13 @@ function Campaign() {
 
     const [selectedTab, setSelected] = useState(0);
     const handleTabChange = useCallback((selectedTabIndex) => setSelected(selectedTabIndex) ,[],);
+
+    const [active, setActive] = useState(false);
+    const toggleActive = useCallback(() => setActive((active) => !active), []);
+
+    const toastMarkup = active ? (
+        <Toast content="Link Copied to Clipboard" onDismiss={toggleActive} />
+    ) : null;
 
     const tabs = [
         {
@@ -269,6 +278,11 @@ function Campaign() {
 
     return (
         <Page fullWidth>
+            <div style={{height:"0px"}}>
+                <Frame>
+                    {toastMarkup}
+                </Frame>
+            </div>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                 <h1 className="Polaris-Header-Title" style={{paddingBottom:"20px",paddingTop:"10px"}}>Campaign Builder</h1>
                 <Button primary onClick={()=>navigate('/new-campaign')} >New Campaign +</Button>

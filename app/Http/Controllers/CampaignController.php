@@ -451,4 +451,17 @@ class CampaignController extends Controller
             'message' => 'Campaign Deleted Successfully',
         ]);
     }
+
+    public function get_campaign_discount(Request $request)
+    {
+        // return $request;
+
+        $discount = CampaignDiscount::where('campaign_id',$request->campaign_id)->first();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Campaign Data Shown',
+            'data' => $discount->discount_code,
+        ]);
+    }
 }
