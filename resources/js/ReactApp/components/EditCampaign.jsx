@@ -318,15 +318,12 @@ function EditCampaign() {
                 <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                     <p>Apply Mystery Discount to</p>
                     <div style={{display:"flex"}}>
-                        <div style={{width:"222px"}}>
+                        <div style={{width:"300px"}}>
                             <Select
                                 options={applyOnOptions}
                                 onChange={(e) => changeDiscountByHandler(e)}
                                 value={selectedApplyOnOptions}
                             />
-                        </div>
-                        <div style={{marginLeft:"10px"}}>
-                            <Button primary onClick={syncHandler}>SYNC</Button>
                         </div>
                     </div>
                 </div>

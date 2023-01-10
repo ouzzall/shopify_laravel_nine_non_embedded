@@ -1,5 +1,7 @@
 <?php namespace App\Jobs;
 
+use App\Models\CollectionProduct;
+use App\Models\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -8,6 +10,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Osiset\ShopifyApp\Objects\Values\ShopDomain;
 use stdClass;
+use Osiset\ShopifyApp\Contracts\Commands\Shop;
+use Osiset\ShopifyApp\Contracts\Queries\Shop as QueriesShop;
+use Osiset\ShopifyApp\Actions\CancelCurrentPlan;
 
 class ProductsDeleteJob implements ShouldQueue
 {
@@ -46,15 +51,21 @@ class ProductsDeleteJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(Shop $shopCommand, QueriesShop $shopQuery, CancelCurrentPlan $cancelCurrentPlanAction): bool
     {
-        // Convert domain
         $this->shopDomain = ShopDomain::fromNative($this->shopDomain);
 
-        Log::info("PRODUCT DELETE");
-        Log::info(json_encode($this->shopDomain));
+        $shop = $shopQuery->getByDomain($this->shopDomain);
+        $shopId = $shop->getId();
 
-        // Do what you wish with the data
-        // Access domain name as $this->shopDomain->toNative()
+        // sync_products($shop);
+
+        $deletion_object = $this->data;
+        // Log::info(json_encode($this->data));
+
+        Product::where('product_id',$deletion_object->id)->delete();
+        CollectionProduct::where('product_id',$deletion_object->id)->delete();
+
+        return true;
     }
 }

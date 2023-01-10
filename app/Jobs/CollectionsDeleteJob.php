@@ -1,18 +1,19 @@
 <?php namespace App\Jobs;
 
+use App\Models\Collection;
+use App\Models\CollectionProduct;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 use Osiset\ShopifyApp\Objects\Values\ShopDomain;
 use stdClass;
 use Osiset\ShopifyApp\Contracts\Commands\Shop;
 use Osiset\ShopifyApp\Contracts\Queries\Shop as QueriesShop;
 use Osiset\ShopifyApp\Actions\CancelCurrentPlan;
 
-class ProductsUpdateJob implements ShouldQueue
+class CollectionsDeleteJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -56,7 +57,14 @@ class ProductsUpdateJob implements ShouldQueue
         $shop = $shopQuery->getByDomain($this->shopDomain);
         $shopId = $shop->getId();
 
-        sync_products($shop);
+        // sync_products($shop);
+
+        $deletion_object = $this->data;
+        // Log::info(json_encode($this->data));
+
+        Collection::where('collection_id',$deletion_object->id)->delete();
+        CollectionProduct::where('collection_id',$deletion_object->id)->delete();
+
         return true;
     }
 }

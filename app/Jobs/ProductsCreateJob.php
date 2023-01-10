@@ -8,6 +8,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Osiset\ShopifyApp\Objects\Values\ShopDomain;
 use stdClass;
+use Osiset\ShopifyApp\Contracts\Commands\Shop;
+use Osiset\ShopifyApp\Contracts\Queries\Shop as QueriesShop;
+use Osiset\ShopifyApp\Actions\CancelCurrentPlan;
 
 class ProductsCreateJob implements ShouldQueue
 {
@@ -46,15 +49,14 @@ class ProductsCreateJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(Shop $shopCommand, QueriesShop $shopQuery, CancelCurrentPlan $cancelCurrentPlanAction): bool
     {
-        // Convert domain
         $this->shopDomain = ShopDomain::fromNative($this->shopDomain);
 
-        Log::info("PRODUCT CREATE");
-        Log::info(json_encode($this->shopDomain));
+        $shop = $shopQuery->getByDomain($this->shopDomain);
+        $shopId = $shop->getId();
 
-        // Do what you wish with the data
-        // Access domain name as $this->shopDomain->toNative()
+        sync_products($shop);
+        return true;
     }
 }

@@ -5,14 +5,13 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 use Osiset\ShopifyApp\Objects\Values\ShopDomain;
 use stdClass;
 use Osiset\ShopifyApp\Contracts\Commands\Shop;
 use Osiset\ShopifyApp\Contracts\Queries\Shop as QueriesShop;
 use Osiset\ShopifyApp\Actions\CancelCurrentPlan;
 
-class ProductsUpdateJob implements ShouldQueue
+class CollectionsUpdateJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
