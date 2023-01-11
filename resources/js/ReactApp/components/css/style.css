@@ -116,7 +116,7 @@ th.Polaris-DataTable__Cell.Polaris-DataTable__Cell--verticalAlignTop.Polaris-Dat
     margin-top: 9px;
 }
 .selectDate button {
-    padding: 9px 75px;
+    width: 300px;
 }
 
 .Polaris-Popover__Content {
