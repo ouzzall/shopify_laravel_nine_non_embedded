@@ -115,9 +115,6 @@ th.Polaris-DataTable__Cell.Polaris-DataTable__Cell--verticalAlignTop.Polaris-Dat
 .iconDateDropdown{
     margin-top: 9px;
 }
-.selectDate button {
-    width: 300px;
-}
 
 .Polaris-Popover__Content {
     position: relative;
@@ -128,6 +125,10 @@ th.Polaris-DataTable__Cell.Polaris-DataTable__Cell--verticalAlignTop.Polaris-Dat
     max-height: none;
     width: 550px !important;
 
+}
+
+.fontBigger {
+    font-size: 18px !important;
 }
 
 /* datePicker css end */

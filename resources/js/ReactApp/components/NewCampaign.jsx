@@ -1,8 +1,8 @@
-import {Page, Card, Button, TextField, Select, DatePicker, Tag, Stack, Tooltip, Text, Icon, Popover} from '@shopify/polaris';
+import {Page, Card, Button, TextField, Select, DatePicker, Tag, Stack, Tooltip, Text, Icon, Popover, Grid} from '@shopify/polaris';
 import {useState,useCallback, useEffect} from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRightMinor, InfoMinor } from '@shopify/polaris-icons';
+import { ArrowLeftMinor, ArrowRightMinor, InfoMinor } from '@shopify/polaris-icons';
 import "./css/style.css";
 
 function NewCampaign() {
@@ -103,11 +103,12 @@ function NewCampaign() {
     const dateRange= `${myStartDate} - ${myEndDate}`;
 
     const activator = (
-        <div className="selectDate">
-            <Button  onClick={setDatePickerTogglePopoverActive} disclosure>
-            {dateRange}
+        <div className='selectDate'>
+            <div style={{marginBottom:"4px"}}>Select Duration</div>
+            <Button fullWidth onClick={setDatePickerTogglePopoverActive} disclosure>
+                {dateRange}
             </Button>
-      </div>
+        </div>
     );
 
     const [saveLoading, setSaveLoading] = useState(false);
@@ -203,7 +204,12 @@ function NewCampaign() {
     const addTagHandler = () => {
 
         let temp = [...selectedTags];
-        temp.push(newTag);
+        if(selectedDiscount == 'fixed') {
+            temp.push(`$${newTag}`);
+        } else {
+            temp.push(`${newTag}%`);
+        }
+
         setNewTag("");
         setSelectedTags(temp);
 
@@ -214,62 +220,60 @@ function NewCampaign() {
 
     return (
       <Page>
-        <Card title="Create Campaign" >
-            {/* <Card.Section>
-            </Card.Section> */}
-            <div style={{paddingLeft:"40px",maxWidth: "650px"}}>
-            <Card.Section>
-                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                    <p>Campaign Name</p>
-                    <div style={{width:"300px"}}>
-                        <TextField
-                        value={campaignName}
-                        onChange={(e) => setCampaignName(e)}
-                        autoComplete="off"
-                        />
-                    </div>
+        <Grid>
+            <Grid.Cell columnSpan={{xs: 12, sm: 12, md: 12, lg: 12, xl: 12}}>
+                <div style={{display:"flex"}}>
+                    <div style={{ border: "1px solid", cursor:"pointer", borderColor: "#c1c1c1", borderRadius: "4px", width: "35px", height: "35px", paddingTop: "6px", marginRight: "15px"}}
+                    onClick={() => {
+                        navigate("/campaigns");
+                    }}> <Icon color='base' source={ArrowLeftMinor} /> </div>
+                    <div className='fontBigger' style={{ fontWeight: "600", marginTop: "6px"}}> Add Campaign </div>
                 </div>
-            </Card.Section>
-            <Card.Section>
-                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                    <p>Apply Mystery Discount to</p>
-                    <div style={{display:"flex"}}>
-                        <div style={{width:"300px"}}>
+            </Grid.Cell>
+            <Grid.Cell columnSpan={{xs: 8, sm: 8, md: 8, lg: 8, xl: 8}}>
+                <Card title="Campaign Application">
+                    <Card.Section>
+                        <div>
+                            <TextField
+                                label="Campaign Name"
+                                value={campaignName}
+                                onChange={(e) => setCampaignName(e)}
+                                autoComplete="off"
+                            />
+                        </div>
+                    </Card.Section>
+                    <Card.Section>
+                        <div>
                             <Select
+                                label="Apply Mystery Discount to"
                                 options={applyOnOptions}
                                 onChange={(e) => changeDiscountByHandler(e)}
                                 value={selectedApplyOnOptions}
                             />
                         </div>
-                    </div>
-                </div>
-                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:"20px"}}>
-                    <p></p>
-                    {showProductCollection &&
-                        <div style={{width:"300px"}}>
-                            <Select
-                            options={furtherOptions}
-                            onChange={(e) => setSelectedFurtherOption(e)}
-                            value={selectedFurtherOption}
-                            />
-                        </div>
-                    }
-                </div>
-            </Card.Section>
-            </div>
-            <Card.Section>
-                <div style={{paddingLeft:"40px",maxWidth: "610px"}}>
-                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderTop: "1px solid #e1e3e5",paddingTop:"20px"}}>
-                        <p>Select Duration</p>
-                        <div>
-                            <div className='datePickerPopover'>
-                                <Popover
-                                    active={datePickerPopoverActive}
-                                    activator={activator}
-                                    autofocusTarget="first-node"
-                                    onClose={setDatePickerTogglePopoverActive}
-                                >
-                                    <div style={{padding:"20px"}}>
+                        {showProductCollection &&
+                            <div style={{marginTop:"15px"}}>
+                                <Select
+                                    label={selectedApplyOnOptions == "product" ? 'Select Product' : 'Select Collection'}
+                                    options={furtherOptions}
+                                    onChange={(e) => setSelectedFurtherOption(e)}
+                                    value={selectedFurtherOption}
+                                />
+                            </div>
+                        }
+                    </Card.Section>
+                </Card>
+                <Card title="Make It Live">
+                    <Card.Section>
+                        <div className='datePickerPopover'>
+                            <Popover
+                                labe
+                                active={datePickerPopoverActive}
+                                activator={activator}
+                                autofocusTarget="first-node"
+                                onClose={setDatePickerTogglePopoverActive}
+                            >
+                                <div style={{padding:"20px"}}>
                                     <div className='datepickerDropdownFields'>
                                         <TextField
                                             value={myStartDate}
@@ -295,30 +299,33 @@ function NewCampaign() {
                                         allowRange
                                         multiMonth
                                     />
+                                    <div style={{paddingTop:"20px",borderTop: "1px solid #e1e3e5",marginTop:"16px", marginBottom:"0px"}}>
                                     </div>
-                                </Popover>
-                            </div>
+                                    <div style={{display:"flex",justifyContent:"flex-end"}}>
+                                        <div style={{marginRight:"10px"}}>
+                                            <Button onClick={() => {setSelectedDates({ start: new Date(), end: new Date() })}}> Cancel</Button>
+                                        </div>
+                                        <Button primary onClick={() => setDatePickerPopoverActive(false)}> Apply </Button>
+                                    </div>
+                                </div>
+                            </Popover>
                         </div>
-                    </div>
-                </div>
-
-            </Card.Section>
-            <div style={{paddingLeft:"40px",maxWidth: "650px"}}>
-                <Card.Section>
-                <div style={{paddingTop:"20px",borderTop: "1px solid #e1e3e5"}}>
-                        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                            <p>Select Discount Type</p>
-                            <div style={{width:"300px"}}>
-                                <Select
-                                    options={discountOptions}
-                                    onChange={(e) => setSelectedDiscount(e)}
-                                    value={selectedDiscount}
-                                />
-                            </div>
+                    </Card.Section>
+                </Card>
+            </Grid.Cell>
+            <Grid.Cell columnSpan={{xs: 4, sm: 4, md: 4, lg: 4, xl: 4}}>
+                <Card title="Create Discount" subdued>
+                    <Card.Section>
+                        <div>
+                            <Select
+                                label="Select Discount Type"
+                                options={discountOptions}
+                                onChange={(e) => setSelectedDiscount(e)}
+                                value={selectedDiscount}
+                            />
                         </div>
-                        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:"20px"}}>
-
-                            <div style={{display:"flex"}}>
+                        <div style={{width:"100%",marginRight:"15px"}} onKeyPress={(e) => {if (e.key === "Enter") { addTagHandler(); }}}>
+                            <div style={{display:"flex", marginBottom:"4px", marginTop:"15px"}}>
                                 <p>Discount Tags</p>
                                 <Tooltip active content="This is info regarding this function.">
                                     <Text variant="bodyMd" fontWeight="bold" as="span">
@@ -326,45 +333,38 @@ function NewCampaign() {
                                     </Text>
                                 </Tooltip>
                             </div>
-                            <div style={{width:"300px" ,display:"flex"}} >
-                                <Card>
-                                    <div style={{ padding: "20px" }}>
-                                        <div style={{ marginBottom: "5px", display: "flex", justifyContent: 'space-between' }}>
-                                            <div style={{width:"100%",marginRight:"15px"}}>
-                                                <TextField
-                                                    value={newTag}
-                                                    onChange={(e) => setNewTag(e)}
-                                                    placeholder="Add tags here"
-                                                    type="text"
-                                                    style={{width:"400px"}}
-                                                />
-                                            </div>
-                                            <Button primary onClick={addTagHandler}>Add</Button>
-                                        </div>
-                                        <div className='tagsInput'>
-                                            <Stack spacing="tight">{tagMarkup}</Stack>
-                                        </div>
-                                    </div>
-                                </Card>
+                            <TextField
+                                prefix={selectedDiscount == "fixed" ? '$' : ''}
+                                suffix={selectedDiscount == "percentage" ? '%' : ''}
+                                value={newTag}
+                                onChange={(e) => {setNewTag(e)}}
+                                placeholder="Add tag here and press enter..."
+                                type="text"
+                                style={{width:"400px"}}
+                                onKeyPress={(e) => console.log(e)}
+                            />
+                        </div>
+                        <div style={{marginTop:"8px"}}>
+                            <Stack spacing="tight">{tagMarkup}</Stack>
+                        </div>
+                    </Card.Section>
+                </Card>
+            </Grid.Cell>
+            <Grid.Cell columnSpan={{xs: 12, sm: 12, md: 12, lg: 12, xl: 12}}>
+                <div style={{paddingTop:"20px",borderTop: "1px solid #e1e3e5",marginTop:"16px", marginBottom:"13px"}}>
+                    <div style={{display:"flex",justifyContent:"flex-end"}}>
+                        <div style={{display:"flex"}}>
+                            <Button onClick={() => navigate("/campaigns")}>Discard</Button>
+                            <div style={{marginLeft:"10px"}}>
+                                {saveLoading ?
+                                <Button primary loading>Save</Button> :
+                                <Button primary onClick={createCampaignHandler}>Save</Button> }
                             </div>
                         </div>
                     </div>
-                </Card.Section>
-            </div>
-        </Card>
-
-        <div style={{paddingTop:"20px",borderTop: "1px solid #e1e3e5",marginTop:"16px", marginBottom:"13px"}}>
-           <div style={{display:"flex",justifyContent:"flex-end"}}>
-                <div style={{display:"flex"}}>
-                    <Button onClick={() => navigate("/campaigns")}>Discard</Button>
-                    <div style={{marginLeft:"10px"}}>
-                        {saveLoading ?
-                        <Button primary loading>Save</Button> :
-                        <Button primary onClick={createCampaignHandler}>Save</Button> }
-                    </div>
                 </div>
-           </div>
-        </div>
+            </Grid.Cell>
+        </Grid>
       </Page>
     );
 }
