@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('campaigns', function (Blueprint $table) {
-            $table->id();
+            $table->id()->startingValue(1001);
             $table->unsignedBigInteger('user_id');
             $table->string('name');
             $table->string('discount_on');
