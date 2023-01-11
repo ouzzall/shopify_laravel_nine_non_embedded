@@ -13,24 +13,16 @@ import React from "react";
 import EditCampaign from "./EditCampaign";
 
 const MysteryDiscountApp = () => {
-
     return (
         <AppProvider i18n={en}>
-            <div style={{ display: "flex" }}>
             <CustomBar />
-            <div style={{ zIndex: "499",marginTop:"55px"}}>
-                {/* <NavigationCustom /> */}
-            </div>
-                <div className="position_check" style={{ width: "100%",marginTop:"55px" }}>
-                    <Routes>
-                        <Route path="/" element={<Dashboard /> } />
-                        <Route path="/campaigns" element={<Campaign /> } />
-                        <Route path="/edit-campaign/:id" element={<EditCampaign /> } />
-                        <Route path="/new-campaign" element={<NewCampaign /> } />
-                        <Route path="*" element={<Loading login={false} /> } />
-                    </Routes>
-                </div>
-            </div>
+            <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/campaigns" element={<Campaign />} />
+                <Route path="/edit-campaign/:id" element={<EditCampaign />} />
+                <Route path="/new-campaign" element={<NewCampaign />} />
+                <Route path="*" element={<Loading login={false} />} />
+            </Routes>
         </AppProvider>
     );
 };

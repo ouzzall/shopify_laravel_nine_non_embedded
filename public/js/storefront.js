@@ -24,7 +24,7 @@ if (my_address.includes("app_dis")) {
             };
 
             fetch(
-                `https://397f-2400-adc5-1b3-b500-d481-8864-8652-e9f2.in.ngrok.io/api/get_campaign_discount`,
+                `https://f18d-119-160-98-4.ap.ngrok.io/api/get_campaign_discount`,
                 {
                     method: "POST",
                     headers: {
