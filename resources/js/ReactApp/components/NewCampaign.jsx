@@ -303,7 +303,7 @@ function NewCampaign() {
                                     </div>
                                     <div style={{display:"flex",justifyContent:"flex-end"}}>
                                         <div style={{marginRight:"10px"}}>
-                                            <Button onClick={() => {setSelectedDates({ start: new Date(), end: new Date() })}}> Cancel</Button>
+                                            <Button onClick={() => {setSelectedDates({ start: new Date(), end: new Date() }); setDatePickerPopoverActive(false)}}> Cancel</Button>
                                         </div>
                                         <Button primary onClick={() => setDatePickerPopoverActive(false)}> Apply </Button>
                                     </div>
