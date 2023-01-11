@@ -134,6 +134,8 @@ function EditCampaign() {
 
     const [deletingCampaignName, setDeletingCampaignName] = useState("");
 
+    const [saveLoading, setSaveLoading] = useState(false);
+
     const syncHandler = () => {
         fetch( "/sync_store", {
                 method: "POST",
@@ -182,6 +184,8 @@ function EditCampaign() {
 
     const updateCampaignHandler = () => {
 
+        setSaveLoading(true);
+
         var date = new Date(selectedDates['start']),
         mnth = ("0" + (date.getMonth() + 1)).slice(-2),
         day = ("0" + date.getDate()).slice(-2);
@@ -214,8 +218,9 @@ function EditCampaign() {
             console.log(data);
             if (data.success === true) {
                 navigate("/campaigns");
+                setSaveLoading(false);
             } else if(data.success === false) {
-
+                setSaveLoading(false);
             }
         });
     }
@@ -452,7 +457,9 @@ function EditCampaign() {
                 <div style={{display:"flex"}}>
                     <Button onClick={() => navigate("/campaigns")}>Cancel</Button>
                     <div style={{marginLeft:"10px"}}>
-                        <Button primary onClick={(updateCampaignHandler)}>Save</Button>
+                        {saveLoading ?
+                        <Button primary loading>Save</Button> :
+                        <Button primary onClick={updateCampaignHandler}>Save</Button> }
                     </div>
                 </div>
            </div>

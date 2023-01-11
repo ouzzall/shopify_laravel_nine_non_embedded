@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
             $table->string('name');
             $table->string('discount_on');
             $table->string('discount_on_data')->nullable();
