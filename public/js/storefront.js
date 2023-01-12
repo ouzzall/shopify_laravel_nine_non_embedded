@@ -16,7 +16,7 @@ if (my_address.includes("app_dis")) {
 
     if (campaign_id) {
         if (localStorage.getItem("shop_name")) {
-            alert("Discount already won.");
+            alert(localStorage.getItem("message"));
         } else {
             let formData2 = {
                 shop: Shopify.shop,
@@ -24,7 +24,7 @@ if (my_address.includes("app_dis")) {
             };
 
             fetch(
-                `https://c840-119-160-98-38.ap.ngrok.io/api/get_campaign_discount`,
+                `https://af41-2400-adc5-1b3-b500-ac11-a213-ca45-e30b.in.ngrok.io/api/get_campaign_discount`,
                 {
                     method: "POST",
                     headers: {
@@ -37,22 +37,25 @@ if (my_address.includes("app_dis")) {
                     return response.json();
                 })
                 .then((data) => {
-                    // console.log(data);
+                    console.log(data);
 
                     if (data.success == true) {
                         localStorage.setItem("discount_code", data.data);
                         localStorage.setItem("shop_name", Shopify.shop);
                         console.log(data.message);
-
+                        let message1 = "";
+                        let message2 = "";
                         if (data.data2 == "percentage") {
-                            alert(
-                                `CONGRATS! You won the Discount of ${data.data1}%.`
-                            );
+                            message1 = `CONGRATS! You won the Discount of ${data.data1}%. Use discount code ${data.data} to avail the discount`;
+                            message2 = `You already won the Discount of ${data.data1}%. Use discount code ${data.data} to avail the discount`;
+                            alert(message1);
                         } else {
-                            alert(
-                                `CONGRATS! You won the Discount of $${data.data1}.`
-                            );
+                            message1 = `CONGRATS! You won the Discount of $${data.data1}. Use discount code ${data.data} to avail the discount`;
+                            message2 = `You already won the Discount of $${data.data1}. Use discount code ${data.data} to avail the discount`;
+                            alert(message1);
                         }
+
+                        localStorage.setItem("message", message2);
                     } else {
                         alert(data.message);
                     }

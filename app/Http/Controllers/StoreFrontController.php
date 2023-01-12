@@ -108,7 +108,8 @@ class StoreFrontController extends Controller
             'message' => 'New discount Generated.',
             'data' => $code,
             'data1' => $campaign->discount_tags[$index],
-            'data2' => $campaign->discount_type
+            'data2' => $campaign->discount_type,
+            'data3' => $campaign->end_date
         ]);
     }
 }
