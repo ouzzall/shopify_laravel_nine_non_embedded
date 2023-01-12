@@ -270,7 +270,7 @@ function EditCampaign() {
 
         } else if(selectedDiscount == 'percentage') {
 
-            if(newTag > "100") {
+            if(newTag > 100) {
 
                 noErrors = false;
                 setMyErrorVisibility(true);
