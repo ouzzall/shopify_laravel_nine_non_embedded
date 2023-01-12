@@ -1,4 +1,4 @@
-import {Page, Card, Button, TextField, Select, DatePicker, Tag, Stack, Tooltip, Text, Icon, Popover, Grid} from '@shopify/polaris';
+import {Page, Card, Button, TextField, Select, DatePicker, Tag, Stack, Tooltip, Text, Icon, Popover, Grid, Banner} from '@shopify/polaris';
 import {useState,useCallback, useEffect} from 'react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -113,6 +113,9 @@ function NewCampaign() {
 
     const [saveLoading, setSaveLoading] = useState(false);
 
+    const [myError, setMyError] = useState("");
+    const [myErrorVisibility, setMyErrorVisibility] = useState(false);
+
 
     const syncHandler = () => {
         fetch( "/sync_store", {
@@ -173,6 +176,16 @@ function NewCampaign() {
         endDay = ("0" + enddate.getDate()).slice(-2);
         const endDate = [enddate.getFullYear(), endMnth, endDay].join("-");
 
+
+
+        let temp = [...selectedTags];
+
+        temp.forEach((element,index) => {
+            element = element.replace('$','');
+            element = element.replace('%','');
+            temp[index] = (element);
+        });
+
         const formData = new FormData();
 
         formData.append("campaign_name", campaignName);
@@ -181,7 +194,7 @@ function NewCampaign() {
         formData.append("start_date", startDate);
         formData.append("end_date", endDate);
         formData.append("discount_type", selectedDiscount);
-        formData.append("discount_tags", JSON.stringify(selectedTags));
+        formData.append("discount_tags", JSON.stringify(temp));
 
         fetch( "/add_new_campaign", {
                 method: "POST",
@@ -203,16 +216,46 @@ function NewCampaign() {
 
     const addTagHandler = () => {
 
-        let temp = [...selectedTags];
-        if(selectedDiscount == 'fixed') {
-            temp.push(`$${newTag}`);
-        } else {
-            temp.push(`${newTag}%`);
+        const check = selectedDiscount == 'fixed' ? '$'+newTag : newTag+'%';
+        let noErrors = true;
+
+        if (/^\d+$/.test(newTag) == false) {
+
+            noErrors = false;
+            setMyErrorVisibility(true);
+            setMyError(`"${newTag}" Tag cannot incude characters, any special charcters or spaces. Only Numbers allowed.`);
+            window.scrollTo(0,0);
+
+        } else if(selectedTags.includes(check)) {
+
+            noErrors = false;
+            setMyErrorVisibility(true);
+            setMyError(`"${newTag}" Same Tag cannot be entered again.`);
+            window.scrollTo(0,0);
+
+        } else if(selectedDiscount == 'percentage') {
+
+            if(newTag > "100") {
+
+                noErrors = false;
+                setMyErrorVisibility(true);
+                setMyError(`"${newTag}" Tag cannot be greater than 100 as discount type is percentage.`);
+                window.scrollTo(0,0);
+            }
         }
 
-        setNewTag("");
-        setSelectedTags(temp);
+        if(noErrors == true) {
+            let temp = [...selectedTags];
+            if(selectedDiscount == 'fixed') {
+                temp.push(`$${newTag}`);
+            } else {
+                temp.push(`${newTag}%`);
+            }
 
+            setNewTag("");
+            setSelectedTags(temp);
+            setMyErrorVisibility(false);
+        }
     }
 
 
@@ -221,6 +264,20 @@ function NewCampaign() {
     return (
       <Page>
         <Grid>
+            {myErrorVisibility &&
+                <Grid.Cell columnSpan={{xs: 12, sm: 12, md: 12, lg: 12, xl: 12}}>
+                    <Banner
+                        title="Error"
+                        // action={{content: 'Review risk analysis'}}
+                        status="critical"
+                        onDismiss={(e) => {setMyErrorVisibility(false)}}
+                    >
+                        <p>
+                            {myError}
+                        </p>
+                    </Banner>
+                </Grid.Cell>
+            }
             <Grid.Cell columnSpan={{xs: 12, sm: 12, md: 12, lg: 12, xl: 12}}>
                 <div style={{display:"flex"}}>
                     <div style={{ border: "1px solid", cursor:"pointer", borderColor: "#c1c1c1", borderRadius: "4px", width: "35px", height: "35px", paddingTop: "6px", marginRight: "15px"}}
@@ -320,7 +377,34 @@ function NewCampaign() {
                             <Select
                                 label="Select Discount Type"
                                 options={discountOptions}
-                                onChange={(e) => setSelectedDiscount(e)}
+                                onChange={(e) => {
+                                    setSelectedDiscount(e);
+                                    let temp = [...selectedTags];
+
+                                    if(e == "percentage") {
+                                        let secondTemp = [];
+                                        temp.forEach(element => {
+                                            element = element.replace('$','');
+                                            element = element.replace('%','');
+                                            if(element <= 100) {
+                                                secondTemp.push(element);
+                                            }
+                                        });
+                                        temp = secondTemp;
+                                    }
+
+                                    temp.forEach((element,index) => {
+                                        if(e == "percentage") {
+                                            element = element.replace('$','');
+                                            temp[index] = element+"%";
+                                        } else {
+                                            element = element.replace('%','');
+                                            temp[index] = "$"+element;
+                                        }
+                                    });
+
+                                    setSelectedTags(temp);
+                                }}
                                 value={selectedDiscount}
                             />
                         </div>
