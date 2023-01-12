@@ -355,7 +355,7 @@ function EditCampaign() {
                                 <Button onClick={() => setActive(false)}>Cancel</Button>
                                 <div style={{marginLeft:"10px"}}>
                                     {deleteLoading ?
-                                    <Button destructive loading disabled>Delete Campaign</Button> :
+                                    <Button primary loading>Delete Campaign</Button> :
                                     <Button destructive onClick={deleteCampaignHandler}>Delete Campaign</Button> }
                                 </div>
                             </div>
@@ -539,7 +539,7 @@ function EditCampaign() {
                         <div style={{display:"flex",justifyContent:"space-between"}}>
                             <div style={{display:"flex"}}>
                                 {duplicateLoading ?
-                                <Button loading disabled> Duplicate </Button> :
+                                <Button primary loading> Duplicate </Button> :
                                 <Button onClick={duplicateHandler}> Duplicate </Button>}
                                 <div style={{marginLeft:"10px"}}>
                                     <Button outline destructive onClick={() => setActive(true)}> Delete </Button>
