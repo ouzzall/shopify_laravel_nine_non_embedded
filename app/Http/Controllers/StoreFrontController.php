@@ -6,6 +6,7 @@ use App\Models\Campaign;
 use App\Models\CampaignDiscount;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class StoreFrontController extends Controller
@@ -15,6 +16,8 @@ class StoreFrontController extends Controller
         // return $request;
 
         $shop = User::where('name', $request->shop)->first();
+
+        // return $shop;
 
         if (empty($shop)) {
             return response()->json([
@@ -83,7 +86,7 @@ class StoreFrontController extends Controller
             ]
         ]);
 
-        // Log::info(json_encode($createPriceRule));
+        Log::info(json_encode($createPriceRule));
 
         $priceRule = $createPriceRule['body']['price_rule'];
         $discountCode = $shop->api()->rest('POST', '/admin/api/2022-01/price_rules/' . $priceRule['id'] . '/discount_codes.json', [
@@ -92,7 +95,7 @@ class StoreFrontController extends Controller
             ]
         ]);
 
-        // Log::info(json_encode($discountCode));
+        Log::info(json_encode($discountCode));
 
         $new_discount_code = new CampaignDiscount;
         $new_discount_code->user_id = $shop->id;
