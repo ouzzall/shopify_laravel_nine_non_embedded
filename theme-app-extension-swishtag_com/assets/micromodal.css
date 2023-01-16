@@ -58,6 +58,7 @@
     margin-bottom: 2rem;
     line-height: 1.5;
     color: rgba(0,0,0,.8);
+    display: inherit;
   }
 
   .modal__btn {

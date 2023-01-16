@@ -16,6 +16,8 @@ function TabsExample() {
             setSelected(1);
         } else if(location.pathname == "/new-campaign") {
             setSelected(2);
+        } else if(location.pathname == "/settings") {
+            setSelected(3);
         }
     }, [location]);
 
@@ -30,6 +32,8 @@ function TabsExample() {
             navigate("/campaigns");
         } else if (selectedTabIndex == 2) {
             navigate("/new-campaign");
+        } else if (selectedTabIndex == 3) {
+            navigate("/settings");
         }
     }, []);
 
@@ -45,6 +49,10 @@ function TabsExample() {
         {
             id: "repeat-customers-1",
             content: "New Campaign +",
+        },
+        {
+            id: "teteat-customers-1",
+            content: "Settings",
         },
     ];
 

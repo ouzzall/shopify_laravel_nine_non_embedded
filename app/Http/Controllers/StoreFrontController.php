@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Campaign;
 use App\Models\CampaignDiscount;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +17,8 @@ class StoreFrontController extends Controller
         // return $request;
 
         $shop = User::where('name', $request->shop)->first();
+
+        $shop_settings = Setting::where('user_id',$shop->id)->first();
 
         // return $shop;
 
@@ -112,7 +115,10 @@ class StoreFrontController extends Controller
             'data' => $code,
             'data1' => $campaign->discount_tags[$index],
             'data2' => $campaign->discount_type,
-            'data3' => $campaign->end_date
+            'data3' => $campaign->end_date,
+            'data4' => $shop_settings->pop_up_type,
+            'data5' => $shop_settings->pop_up_data,
+
         ]);
     }
 }

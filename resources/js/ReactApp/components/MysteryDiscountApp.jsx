@@ -11,6 +11,7 @@ import Dashboard from "./Dashboard";
 import NewCampaign from "./NewCampaign";
 import React from "react";
 import EditCampaign from "./EditCampaign";
+import Settings from "./Settings";
 
 const MysteryDiscountApp = () => {
     return (
@@ -21,6 +22,7 @@ const MysteryDiscountApp = () => {
                 <Route path="/campaigns" element={<Campaign />} />
                 <Route path="/edit-campaign/:id" element={<EditCampaign />} />
                 <Route path="/new-campaign" element={<NewCampaign />} />
+                <Route path="/settings" element={<Settings />} />
                 <Route path="*" element={<Loading login={false} />} />
             </Routes>
         </AppProvider>

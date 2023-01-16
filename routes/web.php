@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\RulesController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,5 +40,10 @@ Route::post('update_existing_campaign',[CampaignController::class,'update_existi
 Route::post('make_campaign_duplicate',[CampaignController::class,'make_campaign_duplicate'])->middleware(['verify.shopify']);
 
 Route::get('delete_campaign',[CampaignController::class,'delete_campaign'])->middleware(['verify.shopify']);
+
+
+Route::get('get_current_settings',[SettingsController::class,'get_current_settings'])->middleware(['verify.shopify']);
+
+Route::post('change_pop_up_type',[SettingsController::class,'change_pop_up_type'])->middleware(['verify.shopify']);
 
 Route::view('/{any}', 'welcome')->where('any', '^(?!webhook).*$')->middleware(['verify.shopify'])->name('welcome');

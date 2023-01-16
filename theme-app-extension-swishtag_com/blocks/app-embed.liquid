@@ -15,7 +15,10 @@
         <h2 class="modal__title" id="modal-1-title">Mystery Discount</h2>
         <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
       </header>
-      <main class="modal__content" id="modal-1-content"></main>
+      <main class="modal__content">
+        <div id="modal-1-content"></div>
+        <div id="extra_things_id"></div>
+      </main>
       <footer class="modal__footer">
         <button class="modal__btn modal__btn-primary" data-micromodal-close>Continue</button>
         <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
@@ -24,12 +27,8 @@
   </div>
 </div>
 
-{% comment %} theme-check-disable ParserBlockingScriptTag {% endcomment %}
-{% comment %} {{ 'micromodal.custom.js' | asset_url | script_tag }} {% endcomment %}
-{% comment %} theme-check-enable ParserBlockingScriptTag {% endcomment %}
-
 <script>
-  console.log('MYSTERY APP BLOCK 12-01-2023 v50');
+  console.log('MYSTERY APP BLOCK 12-01-2023 v75');
 
   function setCookie(cname, cvalue, exdays) {
     const d = new Date();
@@ -53,9 +52,26 @@
     return '';
   }
 
-  // console.log(getCookie("discount_code"));
-  // console.log(getCookie("shop_name"));
-  // console.log(getCookie("message"));
+  function counter(id, start, end, duration) {
+    let obj = document.getElementById(id),
+      current = start,
+      range = end - start,
+      increment = end > start ? 1 : -1,
+      step = Math.abs(Math.floor(duration / range)),
+      timer = setInterval(() => {
+        current += increment;
+        obj.textContent = current;
+        if (current == end) {
+          clearInterval(timer);
+        }
+      }, step);
+  }
+
+  console.log(getCookie('discount_code'));
+  console.log(getCookie('shop_name'));
+  console.log(getCookie('message'));
+  console.log(getCookie('pop_up_type'));
+  console.log(getCookie('pop_up_data'));
 
   let my_address = window.location.href;
   let my_shop = Shopify.shop;
@@ -73,16 +89,41 @@
 
     if (campaign_id) {
       if (getCookie('shop_name') != '') {
-        document.getElementById('modal-1-content').innerHTML = '';
+
+        if(getCookie('pop_up_type') != '' && getCookie('pop_up_type') == 'basic' ) {
+            console.log("1");
+        } else if(getCookie('pop_up_type') != '' && getCookie('pop_up_type') == 'system_counter' ) {
+            console.log("2");
+            document.getElementById('extra_things_id').innerHTML +=
+            `<div style="display:flex;justify-content:center">
+                <div id="count1" class="display-4"> </div>
+            </div>`;
+            counter("count1", 4, 0, 5000);
+        } else if(getCookie('pop_up_type') != '' && getCookie('pop_up_type') == 'system_gif' ) {
+            console.log("3");
+            document.getElementById('extra_things_id').innerHTML +=
+            `<div style="display:flex;justify-content:center">
+                <img src="https://05a9-2400-adc5-1b3-b500-b4f8-dc63-bb74-6520.in.ngrok.io/images/basic_animation.gif" alt="animation" width="400" height="400">
+            </div>`;
+        } else if(getCookie('pop_up_type') != '' && getCookie('pop_up_type') == 'client_gif' ) {
+            console.log("4");
+            document.getElementById('extra_things_id').innerHTML +=
+            `<div style="display:flex;justify-content:center">
+                <img src="https://05a9-2400-adc5-1b3-b500-b4f8-dc63-bb74-6520.in.ngrok.io/${getCookie('pop_up_data')}" alt="animation" width="400" height="400">
+            </div>`;
+        }
+
         document.getElementById('modal-1-content').innerHTML += `<p> ${getCookie('message')} </p>`;
         MicroModal.show('modal-1');
+
+        console.log('ALREADY SAVED WORKING');
       } else {
         let formData2 = {
           shop: Shopify.shop,
           campaign_id: campaign_id,
         };
 
-        fetch(`https://19a3-2400-adc5-1b3-b500-e09c-770c-114d-99e7.in.ngrok.io/api/get_campaign_discount`, {
+        fetch(`https://05a9-2400-adc5-1b3-b500-b4f8-dc63-bb74-6520.in.ngrok.io/api/get_campaign_discount`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -116,11 +157,37 @@
                   message2 = `You already won the Discount of $${data.data1}. Use discount code ${data.data} to avail the discount`;
                 }
 
-                document.getElementById('modal-1-content').innerHTML = '';
                 document.getElementById('modal-1-content').innerHTML += `<p> ${message1} </p>`;
-                MicroModal.show('modal-1');
 
                 setCookie('message', message2, diffDays);
+                setCookie('pop_up_type', data.data4, diffDays);
+                setCookie('pop_up_data', data.data5, diffDays);
+
+                if(data.data4 == 'basic' ) {
+                    console.log("1");
+                } else if(data.data4 == 'system_counter' ) {
+                    console.log("2");
+                    document.getElementById('extra_things_id').innerHTML +=
+                    `<div style="display:flex;justify-content:center">
+                        <div id="count1" class="display-4"> </div>
+                    </div>`;
+                    counter("count1", 4, 0, 5000);
+                } else if(data.data4 == 'system_gif' ) {
+                    console.log("3");
+                    document.getElementById('extra_things_id').innerHTML +=
+                    `<div style="display:flex;justify-content:center">
+                        <img src="https://05a9-2400-adc5-1b3-b500-b4f8-dc63-bb74-6520.in.ngrok.io/images/basic_animation.gif" alt="animation" width="400" height="400">
+                    </div>`;
+                } else if(data.data4 == 'client_gif' ) {
+                    console.log("4");
+                    document.getElementById('extra_things_id').innerHTML +=
+                    `<div style="display:flex;justify-content:center">
+                        <img src="https://05a9-2400-adc5-1b3-b500-b4f8-dc63-bb74-6520.in.ngrok.io/${data.data5}" alt="animation" width="400" height="400">
+                    </div>`;
+                }
+
+                MicroModal.show('modal-1');
+                console.log('NEW DATA SAVED AND SHOWING');
               }
             } else {
               console.log(data.message);
