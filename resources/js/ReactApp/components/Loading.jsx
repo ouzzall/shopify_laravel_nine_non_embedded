@@ -1,12 +1,18 @@
 import { useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Frame, Loading as ShopLoading } from '@shopify/polaris';
 import React from "react";
-const Loading = ({ login }) => {
+const Loading = () => {
+
     const navigate = useNavigate();
 
     useEffect(() => {
-        navigate("/");
+
+        if(typeof shopNm !== 'undefined')
+            navigate("/embedded-screen");
+        else
+            navigate("/");
+
     },[]);
 
     return (

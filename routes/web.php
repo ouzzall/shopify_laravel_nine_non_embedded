@@ -1,8 +1,6 @@
 <?php
 
-use App\Http\Controllers\CampaignController;
-use App\Http\Controllers\RulesController;
-use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,34 +14,28 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->middleware(['verify.shopify'])->name('home');
+Route::get(
+    '/app-install',
+    [AuthController::class, 'app_install_index']
+)->middleware(['verify.shopify'])->name('home');
 
 
-Route::post('sync_store',[CampaignController::class,'sync_store'])->middleware(['verify.shopify']);
+// redirect if authenticated
+Route::view('/login', 'non_embedded')->name('login');
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('get_create_campaign_data',[CampaignController::class,'get_create_campaign_data'])->middleware(['verify.shopify']);
+Route::view('/forget-password', 'non_embedded')->name('forget');
+Route::get('/reset/password/{token}', [AuthController::class, 'createNewPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPasswordAction']);
+Route::post('/set-password', [AuthController::class, 'setPassword']);
+Route::get('/getSession', [AuthController::class, 'getSession']);
 
-Route::post('add_new_discount_rule',[CampaignController::class,'add_new_discount_rule'])->middleware(['verify.shopify']);
+Route::middleware(['auth'])->group(function () {
 
-Route::post('add_new_campaign',[CampaignController::class,'add_new_campaign'])->middleware(['verify.shopify']);
+    Route::get('/', function () {
+        return view('non_embedded');
+    });
 
-Route::post('change_campaign_status',[CampaignController::class,'change_campaign_status'])->middleware(['verify.shopify']);
+});
 
-Route::get('get_all_campaigns',[CampaignController::class,'get_all_campaigns'])->middleware(['verify.shopify']);
-
-Route::get('get_editing_campaign',[CampaignController::class,'get_editing_campaign'])->middleware(['verify.shopify']);
-
-Route::post('update_existing_campaign',[CampaignController::class,'update_existing_campaign'])->middleware(['verify.shopify']);
-
-Route::post('make_campaign_duplicate',[CampaignController::class,'make_campaign_duplicate'])->middleware(['verify.shopify']);
-
-Route::get('delete_campaign',[CampaignController::class,'delete_campaign'])->middleware(['verify.shopify']);
-
-
-Route::get('get_current_settings',[SettingsController::class,'get_current_settings'])->middleware(['verify.shopify']);
-
-Route::post('change_pop_up_type',[SettingsController::class,'change_pop_up_type'])->middleware(['verify.shopify']);
-
-Route::view('/{any}', 'welcome')->where('any', '^(?!webhook).*$')->middleware(['verify.shopify'])->name('welcome');
+Route::view('/{any}', 'non_embedded')->where('any', '^(?!webhook).*$')->name('non_embedded');

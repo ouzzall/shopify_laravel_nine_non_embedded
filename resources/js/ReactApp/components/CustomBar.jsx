@@ -8,7 +8,6 @@ function TabsExample() {
     let location = useLocation();
 
     useEffect(() => {
-        // console.log(location.pathname);
 
         if(location.pathname == "/") {
             setSelected(0);
